@@ -1,0 +1,13 @@
+setup.py
+gendiff/__init__.py
+gendiff/factory.py
+gendiff/main.py
+gendiff/product_config.py
+gendiff/product_json.py
+gendiff/product_yaml.py
+gendiff.egg-info/PKG-INFO
+gendiff.egg-info/SOURCES.txt
+gendiff.egg-info/dependency_links.txt
+gendiff.egg-info/entry_points.txt
+gendiff.egg-info/requires.txt
+gendiff.egg-info/top_level.txt
