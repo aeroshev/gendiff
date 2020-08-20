@@ -1,9 +1,0 @@
-setup.py
-gendiff/__init__.py
-gendiff/main.py
-gendiff.egg-info/PKG-INFO
-gendiff.egg-info/SOURCES.txt
-gendiff.egg-info/dependency_links.txt
-gendiff.egg-info/entry_points.txt
-gendiff.egg-info/requires.txt
-gendiff.egg-info/top_level.txt
