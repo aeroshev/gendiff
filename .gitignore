@@ -4,3 +4,4 @@ gendiff.egg-info
 build
 dist
 *.7z
+gendiff/__pycache__
