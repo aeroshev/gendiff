@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 
-from gendiff.product_json import PlainJSON
-from gendiff.product_yaml import PlainYAML
-from gendiff.product_config import PlainCONFIG
+from gendiff.products.product_json import PlainJSON
+from gendiff.products.product_yaml import PlainYAML
+from gendiff.products.product_config import PlainCONFIG
 
 
 class AbstractFactory(ABC):
