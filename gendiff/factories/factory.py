@@ -7,24 +7,27 @@ from gendiff.products.product_config import PlainCONFIG
 
 class AbstractFactory(ABC):
 
-    @abstractmethod
-    def create_plain(self):
+    @staticmethod
+    def create_plain():
         pass
 
 
-class FactoryJson(AbstractFactory):
+class FactoryJSON(AbstractFactory):
 
-    def create_plain(self):
+    @staticmethod
+    def create_plain() -> PlainJSON:
         return PlainJSON()
 
 
 class FactoryYAML(AbstractFactory):
 
-    def create_plain(self):
-        return PlainYAML
+    @staticmethod
+    def create_plain() -> PlainYAML:
+        return PlainYAML()
 
 
 class FactoryCONFIG(AbstractFactory):
 
-    def create_plain(self):
-        return PlainCONFIG
+    @staticmethod
+    def create_plain() -> PlainCONFIG:
+        return PlainCONFIG()

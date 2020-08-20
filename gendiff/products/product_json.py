@@ -7,8 +7,16 @@ class AbstractJSON(ABC):
     def read(self):
         pass
 
+    @staticmethod
+    def compare(input_1, input_2):
+        pass
+
 
 class PlainJSON(AbstractJSON):
 
     def read(self):
+        pass
+
+    @staticmethod
+    def compare(input_1, input_2):
         pass
