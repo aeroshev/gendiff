@@ -3,3 +3,4 @@ venv
 gendiff.egg-info
 build
 dist
+*.7z
