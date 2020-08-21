@@ -4,7 +4,7 @@ gendiff.egg-info
 build
 dist
 *.7z
-gendiff/__pycache__
+__pycache__/
 *.json
 *.txt
 *.yaml
