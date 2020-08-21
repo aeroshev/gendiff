@@ -17,17 +17,20 @@ class GeneratorAST:
 
         if parent is None and self.__root is None:
             self.__root = new
-            return
+            return self.__root
 
         self.__current_node = parent
         self.__current_node.children.append(new)
 
-    def pre_order(self):
-        if self.__current_node is None:
+        return self.__current_node.children[-1]
+
+    def pre_order(self, node):
+        if node is None:
             return
-        yield self.__current_node
-        for child in self.__current_node.children:
-            self.__current_node = child
+        yield node
+        for child in node.children:
+            for x in self.pre_order(child):
+                yield x
 
     def flush(self):
         self.__current_node = self.__root
