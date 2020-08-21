@@ -22,17 +22,8 @@ def get_concrete_product(factory: AbstractFactory, format_: str):
     return product
 
 
-# TODO reading stuck in loops
 def read_file(file_name) -> str:
-    info = ''
-    while True:
-        print('Before')
-        chunk = file_name.read(1024)
-        print('Good')
-        if not chunk:
-            break
-        info = info.join(chunk.decode('utf-8'))
-        print('Write')
+    info = file_name.read()
     return info
 
 
@@ -51,8 +42,8 @@ def print_version(ctx, param, value):
 @click.option('-v', '--version', required=False, is_flag=True, callback=print_version, expose_value=False,
               is_eager=True, help='output the version program')
 @click.option('-f', '--format', required=False, default='json', help='output format')
-@click.argument('first_config', type=click.File('rb'))
-@click.argument('second_config', type=click.File('rb'))
+@click.argument('first_config', type=click.File('r'))
+@click.argument('second_config', type=click.File('r'))
 def cli(format, first_config, second_config):
     """
     Compares two configuration files and shows a difference.

@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 import json
 
+from gendiff.generator_ast.generator_ast import GeneratorAST, Node
+
 
 class AbstractJSON(ABC):
 
@@ -8,8 +10,8 @@ class AbstractJSON(ABC):
     def read(data: str):
         pass
 
-    @staticmethod
-    def compare(input_1, input_2):
+    @abstractmethod
+    def compare(self, input_1, input_2):
         pass
 
 
@@ -19,8 +21,7 @@ class PlainJSON(AbstractJSON):
     def read(data: str):
         pass
 
-    @staticmethod
-    def compare(input_1, input_2):
+    def compare(self, input_1, input_2):
         pass
 
 
@@ -31,6 +32,10 @@ class JsonJSON(AbstractJSON):
         output = json.loads(data)
         return output
 
-    @staticmethod
-    def compare(input_1, input_2):
-        pass
+    def compare(self, input_1, input_2):
+        if isinstance(input_1, list) and isinstance(input_2, list):
+            for chunk_1, chunk_2 in zip(input_1, input_2):
+                pass
+        elif isinstance(input_1, dict) and isinstance(input_2, dict):
+            for key_1, key_2 in zip(input_1.keys(), input_2.keys()):
+                pass

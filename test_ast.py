@@ -7,6 +7,5 @@ if __name__ == '__main__':
     node_1 = gen.add_node(root, Node(2, []))
     node_2 = gen.add_node(root, Node(3, []))
     node_1_1 = gen.add_node(node_1, Node(11, []))
-    gen.flush()
     for node in gen.pre_order(root):
         print(node.content)
