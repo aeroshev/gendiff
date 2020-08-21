@@ -12,3 +12,9 @@ class PlainYAML(AbstractYAML):
 
     def read(self):
         pass
+
+
+class JsonYAML(AbstractYAML):
+
+    def read(self):
+        pass

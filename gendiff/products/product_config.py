@@ -12,3 +12,9 @@ class PlainCONFIG(AbstractCONFIG):
 
     def read(self):
         pass
+
+
+class JsonCONFIG(AbstractCONFIG):
+
+    def read(self):
+        pass

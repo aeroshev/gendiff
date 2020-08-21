@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
+import json
 
 
 class AbstractJSON(ABC):
 
-    @abstractmethod
-    def read(self):
+    @staticmethod
+    def read(data: str):
         pass
 
     @staticmethod
@@ -14,8 +15,21 @@ class AbstractJSON(ABC):
 
 class PlainJSON(AbstractJSON):
 
-    def read(self):
+    @staticmethod
+    def read(data: str):
         pass
+
+    @staticmethod
+    def compare(input_1, input_2):
+        pass
+
+
+class JsonJSON(AbstractJSON):
+
+    @staticmethod
+    def read(data: str):
+        output = json.loads(data)
+        return output
 
     @staticmethod
     def compare(input_1, input_2):

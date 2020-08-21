@@ -13,13 +13,27 @@ def get_concrete_factory(file_type: str) -> AbstractFactory:
     return factory
 
 
-# TODO Maybe I need global abstract product
-def get_concrete_product(factory: AbstractFactory):
-    pass
+def get_concrete_product(factory: AbstractFactory, format_: str):
+    product = None
+    if format_ == 'json':
+        product = factory.create_json()
+    elif format_ == 'plain':
+        product = factory.create_plain()
+    return product
 
 
-def get_type_file(file_1) -> str:
-    pass
+# TODO reading stuck in loops
+def read_file(file_name) -> str:
+    info = ''
+    while True:
+        print('Before')
+        chunk = file_name.read(1024)
+        print('Good')
+        if not chunk:
+            break
+        info = info.join(chunk.decode('utf-8'))
+        print('Write')
+    return info
 
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
@@ -37,10 +51,12 @@ def print_version(ctx, param, value):
 @click.option('-v', '--version', required=False, is_flag=True, callback=print_version, expose_value=False,
               is_eager=True, help='output the version program')
 @click.option('-f', '--format', required=False, default='json', help='output format')
-@click.argument('firstConfig', type=click.File('r'))
-@click.argument('secondConfig', type=click.File('r'))
-def cli(format, firstConfig, secondConfig):
+@click.argument('first_config', type=click.File('rb'))
+@click.argument('second_config', type=click.File('rb'))
+def cli(format, first_config, second_config):
     """
     Compares two configuration files and shows a difference.
     """
+    click.echo(first_config.name.split('.')[-1])
     click.echo('Hello, world!')
+    click.echo(read_file(first_config))
