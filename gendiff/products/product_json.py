@@ -14,6 +14,10 @@ class AbstractJSON(ABC):
     def compare(self, input_1, input_2):
         pass
 
+    @abstractmethod
+    def research(self, object_):
+        pass
+
 
 class PlainJSON(AbstractJSON):
 
@@ -21,6 +25,9 @@ class PlainJSON(AbstractJSON):
         pass
 
     def compare(self, input_1, input_2):
+        pass
+
+    def research(self, object_):
         pass
 
 
@@ -31,24 +38,39 @@ class JsonJSON(AbstractJSON):
         return self.data
 
     def compare(self, input_1, input_2):
-        if isinstance(input_1, list) and isinstance(input_2, list):
-            for chunk_1, chunk_2 in zip(input_1, input_2):
-                pass
-        elif isinstance(input_1, dict) and isinstance(input_2, dict):
-            for key_1, key_2 in zip(input_1.keys(), input_2.keys()):
-                pass
+        gen = GeneratorAST()
+        root = gen.add_node(None, Node('root', []))
+
+        for value_1, value_2 in zip(self.research(input_1), self.research(input_2)):
+            if value_1 != value_2:
+               pass
 
     def research(self, object_):
+        # if not isinstance(object_, (list, dict)):
+        #     yield object_
+        # else:
+        #     if isinstance(object_, list):
+        #         for node in object_:
+        #             for x in self.research(node):
+        #                 yield x
+        #     elif isinstance(object_, dict):
+        #         for key in object_.keys():
+        #             for x in self.research(object_[key]):
+        #                 yield x
+        #     else:
+        #         raise TypeError
+        gen = GeneratorAST()
+        root = gen.add_node(None, Node('root', []))
+
         if not isinstance(object_, (list, dict)):
-            yield object_
+            gen.add_node(root, Node(object_, []))
+            return
         else:
             if isinstance(object_, list):
                 for node in object_:
-                    for x in self.research(node):
-                        yield x
+                    self.research(node)
             elif isinstance(object_, dict):
-                for key in object_.keys():
-                    for x in self.research(object_[key]):
-                        yield x
+                for key, value in object_.items():
+                    self.research(str(key) + ': ' + str(value))
             else:
                 raise TypeError
