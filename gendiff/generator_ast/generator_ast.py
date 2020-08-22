@@ -1,5 +1,4 @@
 class Node:
-
     __slots__ = ['content', 'children']
 
     def __init__(self, content, children):
@@ -8,7 +7,6 @@ class Node:
 
 
 class GeneratorAST:
-
     __slots__ = ['__root']
 
     def __init__(self):
@@ -21,6 +19,8 @@ class GeneratorAST:
         if parent is None and self.__root is None:
             self.__root = new
             return self.__root
+        elif parent is None and not (self.__root is None):
+            return
 
         current_node = parent
         current_node.children.append(new)
