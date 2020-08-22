@@ -14,13 +14,13 @@ class GeneratorAST:
 
     def add_node(self, parent: Node, new: Node):
         if new is None:
-            return
+            raise KeyError
 
         if parent is None and self.__root is None:
             self.__root = new
             return self.__root
         elif parent is None and not (self.__root is None):
-            return
+            raise KeyError
 
         current_node = parent
         current_node.children.append(new)

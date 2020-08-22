@@ -6,8 +6,8 @@ from gendiff.generator_ast.generator_ast import GeneratorAST, Node
 
 class AbstractJSON(ABC):
 
-    @staticmethod
-    def read(data: str):
+    @abstractmethod
+    def read(self, data: str):
         pass
 
     @abstractmethod
@@ -17,8 +17,7 @@ class AbstractJSON(ABC):
 
 class PlainJSON(AbstractJSON):
 
-    @staticmethod
-    def read(data: str):
+    def read(self, data: str):
         pass
 
     def compare(self, input_1, input_2):
@@ -27,10 +26,9 @@ class PlainJSON(AbstractJSON):
 
 class JsonJSON(AbstractJSON):
 
-    @staticmethod
-    def read(data: str):
-        output = json.loads(data)
-        return output
+    def read(self, data: str):
+        self.data = json.loads(data)
+        return self.data
 
     def compare(self, input_1, input_2):
         if isinstance(input_1, list) and isinstance(input_2, list):
@@ -39,3 +37,18 @@ class JsonJSON(AbstractJSON):
         elif isinstance(input_1, dict) and isinstance(input_2, dict):
             for key_1, key_2 in zip(input_1.keys(), input_2.keys()):
                 pass
+
+    def research(self, object_):
+        if not isinstance(object_, (list, dict)):
+            yield object_
+        else:
+            if isinstance(object_, list):
+                for node in object_:
+                    for x in self.research(node):
+                        yield x
+            elif isinstance(object_, dict):
+                for key in object_.keys():
+                    for x in self.research(object_[key]):
+                        yield x
+            else:
+                raise TypeError
