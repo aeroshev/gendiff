@@ -5,7 +5,6 @@ build
 dist
 *.7z
 __pycache__/
-*.json
 *.txt
 *.yaml
 *.ini
