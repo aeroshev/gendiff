@@ -20,6 +20,10 @@ class AbstractJSON(ABC):
     def research(self, object_, root, gen):
         pass
 
+    @abstractmethod
+    def render(self):
+        pass
+
 
 class PlainJSON(AbstractJSON):
 
@@ -30,6 +34,9 @@ class PlainJSON(AbstractJSON):
         pass
 
     def research(self, object_, root, gen):
+        pass
+
+    def render(self):
         pass
 
 
@@ -44,46 +51,50 @@ class JsonJSON(AbstractJSON):
         diff_tree = GeneratorAST()
         root = diff_tree.add_node(None, Node('root', []))
 
-        leaf_1 = input_1.pre_order(input_1.tree)
-        help_1 = input_1.pre_order(input_1.tree)
+        self.leaf_1 = input_1.pre_order(input_1.tree)
+        self.help_1 = input_1.pre_order(input_1.tree)
 
-        leaf_2 = input_2.pre_order(input_2.tree)
-        help_2 = input_2.pre_order(input_2.tree)
+        self.leaf_2 = input_2.pre_order(input_2.tree)
+        self.help_2 = input_2.pre_order(input_2.tree)
 
-        stop_before = False
-        stop_after = False
+        self.stop_before = False
+        self.stop_after = False
 
+        self.loop_shit(root, diff_tree)
+
+        return diff_tree
+
+    def loop_shit(self, current, diff_tree):
         try:
             while True:
-                data_1 = next(leaf_1)
-                data_2 = next(leaf_2)
+                data_1 = next(self.leaf_1)
+                data_2 = next(self.leaf_2)
 
-                if not stop_before:
-                    next(help_1)
-                if not stop_after:
-                    next(help_2)
-                stop_before = False
-                stop_after = False
+                if not self.stop_before:
+                    next(self.help_1)
+                if not self.stop_after:
+                    next(self.help_2)
+                self.stop_before = False
+                self.stop_after = False
 
                 if data_1.content != data_2.content:
-                    help_data_1 = next(help_1)
-                    help_data_2 = next(help_2)
+                    help_data_1 = next(self.help_1)
+                    help_data_2 = next(self.help_2)
 
                     if data_2.content == help_data_1.content:
-                        diff_tree.add_node(root, Node(f'- {data_1.content}', []))
-                        stop_after = True
-                        next(leaf_1)
+                        diff_tree.add_node(current, Node(f'- {data_1.content}', []))
+                        self.stop_after = True
+                        next(self.leaf_1)
                     elif data_1.content == help_data_2.content:
-                        diff_tree.add_node(root, Node(f'+ {data_2.content}', []))
-                        stop_before = True
-                        next(leaf_2)
+                        diff_tree.add_node(current, Node(f'+ {data_2.content}', []))
+                        self.stop_before = True
+                        next(self.leaf_2)
                     elif data_1.content.split(':')[0] == data_2.content.split(':')[0]:
-                        diff_tree.add_node(root, Node(f'- {data_1.content}\n+ {data_2.content}', []))
-                        stop_after = True
-                        stop_before = True
+                        diff_tree.add_node(current, Node(f'- {data_1.content}\n+ {data_2.content}', []))
+                        self.stop_after = True
+                        self.stop_before = True
         except StopIteration:
             pass
-        return diff_tree
 
     def research(self, object_, root, gen):
         if not isinstance(object_, (list, dict)):
@@ -97,7 +108,7 @@ class JsonJSON(AbstractJSON):
             elif isinstance(object_, dict):
                 for key, value in object_.items():
                     if isinstance(value, dict):
-                        parent = gen.add_node(root, Node(key, []))
+                        parent = gen.add_node(root, Node(f'{key}-{len(value)}', []))
                         self.research(value, parent, gen)
                     elif isinstance(value, list):
                         list_value = '['
@@ -108,3 +119,6 @@ class JsonJSON(AbstractJSON):
                         self.research(f'{key}: {value}', root, gen)
             else:
                 raise TypeError
+
+    def render(self):
+        pass
