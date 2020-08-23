@@ -75,10 +75,10 @@ class JsonJSON(AbstractJSON):
                         self.research(value, parent, gen)
                     elif isinstance(value, list):
                         list_value = '['
-                        list_value += ' '.join([str(elem) + ', ' for elem in value])
+                        list_value += ' '.join([f'{elem}, ' for elem in value])
                         list_value += ']'
-                        self.research(key + ': ' + list_value, root, gen)
+                        self.research(f'{key}: {list_value}', root, gen)
                     else:
-                        self.research(str(key) + ': ' + str(value), root, gen)
+                        self.research(f'{key}: {value}', root, gen)
             else:
                 raise TypeError
