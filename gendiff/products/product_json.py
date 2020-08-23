@@ -15,7 +15,7 @@ class AbstractJSON(ABC):
         pass
 
     @abstractmethod
-    def research(self, object_):
+    def research(self, object_, root, gen):
         pass
 
 
@@ -27,7 +27,7 @@ class PlainJSON(AbstractJSON):
     def compare(self, input_1, input_2):
         pass
 
-    def research(self, object_):
+    def research(self, object_, root, gen):
         pass
 
 
@@ -45,7 +45,7 @@ class JsonJSON(AbstractJSON):
             if value_1 != value_2:
                pass
 
-    def research(self, object_):
+    def research(self, object_, root, gen):
         # if not isinstance(object_, (list, dict)):
         #     yield object_
         # else:
@@ -59,8 +59,6 @@ class JsonJSON(AbstractJSON):
         #                 yield x
         #     else:
         #         raise TypeError
-        gen = GeneratorAST()
-        root = gen.add_node(None, Node('root', []))
 
         if not isinstance(object_, (list, dict)):
             gen.add_node(root, Node(object_, []))
@@ -68,9 +66,19 @@ class JsonJSON(AbstractJSON):
         else:
             if isinstance(object_, list):
                 for node in object_:
-                    self.research(node)
+                    parent = gen.add_node(root, Node('list', []))
+                    self.research(node, parent, gen)
             elif isinstance(object_, dict):
                 for key, value in object_.items():
-                    self.research(str(key) + ': ' + str(value))
+                    if isinstance(value, dict):
+                        parent = gen.add_node(root, Node(key, []))
+                        self.research(value, parent, gen)
+                    elif isinstance(value, list):
+                        list_value = '['
+                        list_value += ' '.join([str(elem) + ', ' for elem in value])
+                        list_value += ']'
+                        self.research(key + ': ' + list_value, root, gen)
+                    else:
+                        self.research(str(key) + ': ' + str(value), root, gen)
             else:
                 raise TypeError

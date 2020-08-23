@@ -5,6 +5,9 @@ class Node:
         self.content = content
         self.children = children
 
+    def __str__(self):
+        return self.content
+
 
 class GeneratorAST:
     __slots__ = ['__root']
@@ -20,10 +23,11 @@ class GeneratorAST:
             self.__root = new
             return self.__root
         elif parent is None and not (self.__root is None):
-            raise KeyError
-
-        current_node = parent
-        current_node.children.append(new)
+            current_node = self.__root
+            current_node.children.append(new)
+        else:
+            current_node = parent
+            current_node.children.append(new)
 
         return current_node.children[-1]
 
