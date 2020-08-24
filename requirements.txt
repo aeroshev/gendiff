@@ -1,13 +1,15 @@
 attrs==20.1.0
 click==7.1.2
 colorama==0.4.3
--e git+https://github.com/aeroshev/gendiff.git@8d32b0ddbb887f89a002c5f5279246c309fc91d6#egg=gendiff
+-e git+https://github.com/aeroshev/gendiff.git@1acf143db9a8569b5d940519c648a249d8faacbb#egg=gendiff
 iniconfig==1.0.1
+jsondiff==1.2.0
 more-itertools==8.4.0
 packaging==20.4
 pluggy==0.13.1
 py==1.9.0
 pyparsing==2.4.7
 pytest==6.0.1
+PyYAML==5.3.1
 six==1.15.0
 toml==0.10.1
