@@ -1,4 +1,4 @@
-from gendiff.generator_ast.generator_ast import GeneratorAST, Node
+# from gendiff.generator_ast.generator_ast import GeneratorAST, Node
 
 
 if __name__ == '__main__':

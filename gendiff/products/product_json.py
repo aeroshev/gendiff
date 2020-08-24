@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
 import json
-from itertools import tee
-from copy import copy
-
-from gendiff.generator_ast.generator_ast import GeneratorAST, Node
+from colorama import init, Fore
+from gendiff.generator_ast.components import Component, Composite, Leaf
+from jsondiff import diff
 
 
 class AbstractJSON(ABC):
@@ -17,108 +16,101 @@ class AbstractJSON(ABC):
         pass
 
     @abstractmethod
-    def research(self, object_, root, gen):
+    def research(self, object_, parent: Component):
         pass
 
     @abstractmethod
-    def render(self):
+    def render(self, result):
         pass
 
 
 class PlainJSON(AbstractJSON):
 
     def read(self, data: str):
+        return json.loads(data)
+
+    def compare(self, input_1_json, input_2_json):
+        return diff(input_1_json, input_2_json, syntax='symmetric')
+
+    def research(self, object_, parent: Component):
         pass
 
-    def compare(self, input_1, input_2):
-        pass
-
-    def research(self, object_, root, gen):
-        pass
-
-    def render(self):
+    def render(self, result):
         pass
 
 
 class JsonJSON(AbstractJSON):
 
+    def __init__(self):
+        self.color = Fore.WHITE
+        self.deep = 0
+        init()
+
     def read(self, data: str):
-        self.data = json.loads(data)
-        return self.data
+        return json.loads(data)
 
-    # TODO
-    def compare(self, input_1: GeneratorAST, input_2: GeneratorAST) -> GeneratorAST:
-        diff_tree = GeneratorAST()
-        root = diff_tree.add_node(None, Node('root', []))
+    def compare(self, input_1_json, input_2_json):
+        return diff(input_1_json, input_2_json, syntax='symmetric')
 
-        self.leaf_1 = input_1.pre_order(input_1.tree)
-        self.help_1 = input_1.pre_order(input_1.tree)
+    def render(self, result):
+        status = {'$insert', '$update', '$delete'}
 
-        self.leaf_2 = input_2.pre_order(input_2.tree)
-        self.help_2 = input_2.pre_order(input_2.tree)
+        for key, value in result.items():
+            if str(key) in status:
+                if str(key) == '$insert':
+                    if isinstance(value, dict):
+                        self.deep += 1
+                        self.color = 'green'
+                        self.render(value)
+                        self.deep -= 1
+                    else:
+                        print(self.deep*' ' + f'{Fore.GREEN}+ {value}')
+                elif str(key) == '$delete':
+                    if isinstance(value, dict):
+                        self.deep += 1
+                        self.color = 'red'
+                        self.render(value)
+                        self.deep -= 1
+                    else:
+                        print(self.deep * ' ' + f'{Fore.RED}- {value}')
+            else:
+                if isinstance(value, list):
+                    print(self.deep*' ' + f'{Fore.RED}- {key}: {value[0]}')
+                    print(self.deep*' ' + f'{Fore.GREEN}+ {key}: {value[1]}')
+                elif isinstance(value, dict):
+                    print(self.deep*' ' + f'{Fore.WHITE}{key}: ' + '{')
+                    self.deep += 1
+                    self.render(value)
+                    self.deep -= 1
+                    print(Fore.WHITE + self.deep*' ' + '}')
+                else:
+                    if self.color == 'green':
+                        print(self.deep*' ' + f'{Fore.GREEN}+ {key}: {value}')
+                    elif self.color == 'red':
+                        print(self.deep * ' ' + f'{Fore.RED}- {key}: {value}')
 
-        self.stop_before = False
-        self.stop_after = False
-
-        self.loop_shit(root, diff_tree)
-
-        return diff_tree
-
-    def loop_shit(self, current, diff_tree):
-        try:
-            while True:
-                data_1 = next(self.leaf_1)
-                data_2 = next(self.leaf_2)
-
-                if not self.stop_before:
-                    next(self.help_1)
-                if not self.stop_after:
-                    next(self.help_2)
-                self.stop_before = False
-                self.stop_after = False
-
-                if data_1.content != data_2.content:
-                    help_data_1 = next(self.help_1)
-                    help_data_2 = next(self.help_2)
-
-                    if data_2.content == help_data_1.content:
-                        diff_tree.add_node(current, Node(f'- {data_1.content}', []))
-                        self.stop_after = True
-                        next(self.leaf_1)
-                    elif data_1.content == help_data_2.content:
-                        diff_tree.add_node(current, Node(f'+ {data_2.content}', []))
-                        self.stop_before = True
-                        next(self.leaf_2)
-                    elif data_1.content.split(':')[0] == data_2.content.split(':')[0]:
-                        diff_tree.add_node(current, Node(f'- {data_1.content}\n+ {data_2.content}', []))
-                        self.stop_after = True
-                        self.stop_before = True
-        except StopIteration:
-            pass
-
-    def research(self, object_, root, gen):
+    def research(self, object_, parent: Component):
         if not isinstance(object_, (list, dict)):
-            gen.add_node(root, Node(object_, []))
+            parent.add(Leaf(object_))
             return
         else:
             if isinstance(object_, list):
                 for node in object_:
-                    parent = gen.add_node(root, Node('list', []))
-                    self.research(node, parent, gen)
+                    node_ = Composite('list', len(object_))
+                    parent.add(node_)
+                    self.research(node, node_)
             elif isinstance(object_, dict):
                 for key, value in object_.items():
                     if isinstance(value, dict):
-                        parent = gen.add_node(root, Node(f'{key}-{len(value)}', []))
-                        self.research(value, parent, gen)
+                        node = Composite('dict', key)
+                        parent.add(node)
+                        self.research(value, node)
                     elif isinstance(value, list):
                         list_value = '['
                         list_value += ' '.join([f'{elem}, ' for elem in value])
                         list_value += ']'
-                        self.research(f'{key}: {list_value}', root, gen)
+                        self.research(f'{key}: {list_value}', parent)
                     else:
-                        self.research(f'{key}: {value}', root, gen)
+                        self.research(f'{key}: {value}', parent)
             else:
                 raise TypeError
-
-    def render(self):
-        pass
