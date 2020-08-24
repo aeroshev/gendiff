@@ -14,7 +14,6 @@ class AbstractJSON(ABC):
         iter_1 = iter(input_1_json)
         iter_2 = iter(input_2_json)
 
-
         while True:
             broke = 0
             try:
@@ -28,14 +27,26 @@ class AbstractJSON(ABC):
             if broke == 2:
                 break
         # for item_1, item_2 in input_1_json, input_2_json:
-            old_in_new = input_2_json.get(item_1)
-            new_in_old = input_1_json.get(item_2)
-            old_in_old = input_1_json.get(item_1)
-            new_in_new = input_2_json.get(item_2)
+            # 1 = 2 = 3 = 4 <-> nothing
+            # 1 = 3, 2 = 4 <-> nothing
+            # 1 = 3, 2 != 4 <-> update item 2
+            # 1 != 3 <-> update item 1, if dict update children
+            # 2 - None 4 - object <-> insert item 2
+            # 2 = 4, 1 = None, 3 - object <-> delete item 1
 
-            if not new_in_old:
+            # 2 - None, 4 - object <-> insert item 2
+            # 2 - object, 4 - object <-> update item 2
+
+            # 1 - None, 3 - object <-> delete item 1
+            # 1 - object, 3 - object <-> update item 1
+            old_in_new = input_2_json.get(item_1)  # 1
+            new_in_old = input_1_json.get(item_2)  # 2
+            old_in_old = input_1_json.get(item_1)  # 3
+            new_in_new = input_2_json.get(item_2)  # 4
+
+            if new_in_old is None:
                 self.ast.append(Component(item_2, 'insert', input_2_json[item_2]))
-            if not old_in_new:
+            if old_in_new is None:
                 self.ast.append(Component(item_1, 'delete', input_1_json[item_1]))
             if not (old_in_new is None) and not (old_in_old is None) and old_in_new != old_in_old:
                 if isinstance(old_in_old, dict) and isinstance(old_in_new, dict):
@@ -46,8 +57,6 @@ class AbstractJSON(ABC):
                     self.ast.append(Component(item_1, 'children', new_))
                 else:
                     self.ast.append(Component(item_1, 'update', [old_in_old, old_in_new]))
-            # if not new_in_old and new_in_new:
-            #     self.ast.append(Component(item_2, 'insert', new_in_new))
 
         return self.ast
 

@@ -6,3 +6,9 @@ class Component:
         self.param = param
         self.state = state
         self.value = value
+
+    def __str__(self):
+        return f'{self.param}, {self.state}, {self.value}'
+
+    def __repr__(self):
+        return f'{self.param}, {self.state}, {self.value}'
