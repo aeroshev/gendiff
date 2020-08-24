@@ -12,6 +12,8 @@ if __name__ == '__main__':
         des_data_before = an.read(str_data_before)
         des_data_after = an.read(str_data_after)
 
-        diff = an.compare(des_data_before, des_data_after)
-        an.render(diff)
+        print(des_data_before)
+
+        # diff = an.compare(des_data_before, des_data_after)
+        # an.render(diff)
 

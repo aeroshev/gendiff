@@ -56,7 +56,6 @@
         "name": "Lester Gillespie"
       }
     ],
-    "greeting": "Hello, Jayne! You have 9 unread messages.",
     "favoriteFruit": "apple"
   },
   {
@@ -71,6 +70,10 @@
     "name": {
       "first": "Watkins",
       "last": "Hayes"
+    },
+    "getter": {
+      "set": true,
+      "get": true
     },
     "company": "EMTRAK",
     "email": "watkins.hayes@emtrak.ca",

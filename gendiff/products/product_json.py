@@ -7,25 +7,6 @@ from jsondiff import diff
 
 class AbstractJSON(ABC):
 
-    @abstractmethod
-    def read(self, data: str):
-        pass
-
-    @abstractmethod
-    def compare(self, input_1, input_2):
-        pass
-
-    @abstractmethod
-    def research(self, object_, parent: Component):
-        pass
-
-    @abstractmethod
-    def render(self, result):
-        pass
-
-
-class PlainJSON(AbstractJSON):
-
     def read(self, data: str):
         return json.loads(data)
 
@@ -33,7 +14,37 @@ class PlainJSON(AbstractJSON):
         return diff(input_1_json, input_2_json, syntax='symmetric')
 
     def research(self, object_, parent: Component):
+        if not isinstance(object_, (list, dict)):
+            parent.add(Leaf(object_))
+            return
+        else:
+            if isinstance(object_, list):
+                for node in object_:
+                    node_ = Composite('list', len(object_))
+                    parent.add(node_)
+                    self.research(node, node_)
+            elif isinstance(object_, dict):
+                for key, value in object_.items():
+                    if isinstance(value, dict):
+                        node = Composite('dict', key)
+                        parent.add(node)
+                        self.research(value, node)
+                    elif isinstance(value, list):
+                        list_value = '['
+                        list_value += ' '.join([f'{elem}, ' for elem in value])
+                        list_value += ']'
+                        self.research(f'{key}: {list_value}', parent)
+                    else:
+                        self.research(f'{key}: {value}', parent)
+            else:
+                raise TypeError
+
+    @abstractmethod
+    def render(self, result):
         pass
+
+
+class PlainJSON(AbstractJSON):
 
     def render(self, result):
         pass
@@ -45,12 +56,6 @@ class JsonJSON(AbstractJSON):
         self.color = Fore.WHITE
         self.deep = 0
         init()
-
-    def read(self, data: str):
-        return json.loads(data)
-
-    def compare(self, input_1_json, input_2_json):
-        return diff(input_1_json, input_2_json, syntax='symmetric')
 
     def render(self, result):
         status = {'$insert', '$update', '$delete'}
@@ -88,29 +93,4 @@ class JsonJSON(AbstractJSON):
                         print(self.deep*' ' + f'{Fore.GREEN}+ {key}: {value}')
                     elif self.color == 'red':
                         print(self.deep * ' ' + f'{Fore.RED}- {key}: {value}')
-
-    def research(self, object_, parent: Component):
-        if not isinstance(object_, (list, dict)):
-            parent.add(Leaf(object_))
-            return
-        else:
-            if isinstance(object_, list):
-                for node in object_:
-                    node_ = Composite('list', len(object_))
-                    parent.add(node_)
-                    self.research(node, node_)
-            elif isinstance(object_, dict):
-                for key, value in object_.items():
-                    if isinstance(value, dict):
-                        node = Composite('dict', key)
-                        parent.add(node)
-                        self.research(value, node)
-                    elif isinstance(value, list):
-                        list_value = '['
-                        list_value += ' '.join([f'{elem}, ' for elem in value])
-                        list_value += ']'
-                        self.research(f'{key}: {list_value}', parent)
-                    else:
-                        self.research(f'{key}: {value}', parent)
-            else:
-                raise TypeError
+        print(Fore.WHITE, end='')
