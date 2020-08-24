@@ -1,5 +1,4 @@
 from gendiff.products.product_json import JsonJSON
-from gendiff.generator_ast.components import Composite, Root, WalkerTree
 
 
 if __name__ == '__main__':
@@ -12,8 +11,11 @@ if __name__ == '__main__':
         des_data_before = an.read(str_data_before)
         des_data_after = an.read(str_data_after)
 
-        print(des_data_before)
-
-        # diff = an.compare(des_data_before, des_data_after)
+        diff = an.compare(des_data_before, des_data_after)
+        for i in diff:
+            print(i.param)
+            print(i.state)
+            print(i.value)
+            print(' '*100)
         # an.render(diff)
 

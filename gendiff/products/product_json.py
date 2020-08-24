@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import json
 from colorama import init, Fore
-from gendiff.generator_ast.components import Component, Composite, Leaf
+from gendiff.generator_ast.components import Component
 from jsondiff import diff
 
 
@@ -11,7 +11,45 @@ class AbstractJSON(ABC):
         return json.loads(data)
 
     def compare(self, input_1_json, input_2_json):
-        return diff(input_1_json, input_2_json, syntax='symmetric')
+        iter_1 = iter(input_1_json)
+        iter_2 = iter(input_2_json)
+
+
+        while True:
+            broke = 0
+            try:
+                item_1 = next(iter_1)
+            except StopIteration:
+                broke += 1
+            try:
+                item_2 = next(iter_2)
+            except StopIteration:
+                broke += 1
+            if broke == 2:
+                break
+        # for item_1, item_2 in input_1_json, input_2_json:
+            old_in_new = input_2_json.get(item_1)
+            new_in_old = input_1_json.get(item_2)
+            old_in_old = input_1_json.get(item_1)
+            new_in_new = input_2_json.get(item_2)
+
+            if not new_in_old:
+                self.ast.append(Component(item_2, 'insert', input_2_json[item_2]))
+            if not old_in_new:
+                self.ast.append(Component(item_1, 'delete', input_1_json[item_1]))
+            if not (old_in_new is None) and not (old_in_old is None) and old_in_new != old_in_old:
+                if isinstance(old_in_old, dict) and isinstance(old_in_new, dict):
+                    store = self.ast
+                    self.ast = []
+                    new_ = self.compare(old_in_old, old_in_new)
+                    self.ast = store
+                    self.ast.append(Component(item_1, 'children', new_))
+                else:
+                    self.ast.append(Component(item_1, 'update', [old_in_old, old_in_new]))
+            # if not new_in_old and new_in_new:
+            #     self.ast.append(Component(item_2, 'insert', new_in_new))
+
+        return self.ast
 
     def research(self, object_, parent: Component):
         if not isinstance(object_, (list, dict)):
@@ -55,6 +93,7 @@ class JsonJSON(AbstractJSON):
     def __init__(self):
         self.color = Fore.WHITE
         self.deep = 0
+        self.ast = []
         init()
 
     def render(self, result):
