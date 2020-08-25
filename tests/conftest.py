@@ -26,12 +26,4 @@ def read_data_from_file(param: tuple):
 
         des_data_1 = desereliaze(data_1, param[1])
         des_data_2 = desereliaze(data_2, param[1])
-        yield (des_data_1, des_data_2)
-
-#
-# if __name__ == '__main__':
-#     r = read_data_from_file(('nested', 'json'))
-#     tuple_ = next(r)
-#     print(tuple_[0])
-#     print('-' * 100)
-#     print(tuple_[1])
+        yield des_data_1, des_data_2

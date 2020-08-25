@@ -1,6 +1,5 @@
 from gendiff.products.product_json import JsonJSON
 from gendiff.generator_ast.components import Component
-import pytest
 import unittest
 import os
 import json
@@ -34,7 +33,7 @@ def read_data_from_file(format_: str, type_: str):
 class TestSuit(unittest.TestCase):
 
     # @pytest.mark.parametrize('read_data_from_file', ('nested', 'json'))
-    def test_case_1(self):
+    def test_case_diff_json(self):
         reference_ast = {Component('group3', 'insert', {'fee': '100500'}),
                          Component('group2', 'delete', {'abc': '12345'}),
                          Component('group1', 'children', {
@@ -60,8 +59,8 @@ class TestSuit(unittest.TestCase):
                          })}
 
         product = JsonJSON()
-        data = read_data_from_file('nested', 'json')
-        ast = product.compare(data[0], data[1])
+        data_1, data_2 = read_data_from_file('nested', 'json')
+        ast = product.compare(data_1, data_2)
 
         self.assertSetEqual(reference_ast, ast)
 

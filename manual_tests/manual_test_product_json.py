@@ -1,9 +1,10 @@
-from gendiff.products.product_json import JsonJSON
+from gendiff.products.product_json import JsonJSON, PlainJSON
 import os
 
 
 if __name__ == '__main__':
     an = JsonJSON()
+    p = PlainJSON()
 
     project_dir = os.path.dirname(os.path.dirname(__file__))
     files_dir = os.path.join(project_dir, "test_files/nested")
@@ -19,10 +20,13 @@ if __name__ == '__main__':
         des_data_after = an.read(str_data_after)
 
         diff = an.compare(des_data_before, des_data_after)
-        for i in diff:
-            print(i.param)
-            print(i.state)
-            print(i.value)
-            print(' '*100)
+
+        an.render(diff)
+        p.render(diff)
+        # for i in diff:
+        #     print(i.param)
+        #     print(i.state)
+        #     print(i.value)
+        #     print(' '*100)
         # an.render(diff)
 
