@@ -64,22 +64,24 @@ class AbstractJSON(ABC):
 
 class PlainJSON(AbstractJSON):
 
-    __slots__ = 'ast'
+    __slots__ = ('ast', 'path')
 
     def __init__(self):
         self.ast = set()
+        self.path = []
         init()
 
     def render(self, result):
         complex_value = '[complex value]'
         for item in result:
+            self.path.append(item.param)
             if item.state == 'insert':
-                print(f'{Fore.WHITE}Property {Fore.GREEN}\'{item.param}\'{Fore.WHITE} was added with value: '
+                print(f'{Fore.WHITE}Property {Fore.GREEN}\'{".".join(self.path)}\'{Fore.WHITE} was added with value: '
                       f'{Fore.GREEN}{complex_value if isinstance(item.value, dict) else item.value}')
             elif item.state == 'delete':
-                print(f'{Fore.WHITE}Property {Fore.RED}\'{item.param}\'{Fore.WHITE} was removed')
+                print(f'{Fore.WHITE}Property {Fore.RED}\'{".".join(self.path)}\'{Fore.WHITE} was removed')
             elif item.state == 'update':
-                print(f'{Fore.WHITE}Property {Fore.YELLOW}\'{item.param}\'{Fore.WHITE} was updated. From '
+                print(f'{Fore.WHITE}Property {Fore.YELLOW}\'{".".join(self.path)}\'{Fore.WHITE} was updated. From '
                       f'{Fore.RED}{complex_value if isinstance(item.value[0], dict) else item.value[0]} '
                       f'{Fore.WHITE}to '
                       f'{Fore.GREEN}{complex_value if isinstance(item.value[1], dict) else item.value[1]}')
@@ -87,6 +89,7 @@ class PlainJSON(AbstractJSON):
                 self.render(item.value)
             else:
                 raise TypeError
+            self.path.pop(-1)
         print(f'{Fore.WHITE}', end='')
 
 
