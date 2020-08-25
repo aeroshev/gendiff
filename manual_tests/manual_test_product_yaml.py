@@ -1,10 +1,18 @@
-from gendiff.products.product_yaml import JsonYAML
+from gendiff.products.product_yaml import NestedYAML, PlainYAML
+import os
 
 
 if __name__ == '__main__':
-    y = JsonYAML()
+    y = NestedYAML()
+    py = PlainYAML()
 
-    with open('before.yaml', 'r') as file_1, open('after.yaml', 'r') as file_2:
+    project_dir = os.path.dirname(os.path.dirname(__file__))
+    files_dir = os.path.join(project_dir, "test_files/nested")
+
+    path_file_before = os.path.join(files_dir, "before.yaml")
+    path_file_after = os.path.join(files_dir, "after.yaml")
+
+    with open(path_file_before, 'r') as file_1, open(path_file_after, 'r') as file_2:
         s_1 = file_1.read()
         s_2 = file_2.read()
 
@@ -12,5 +20,6 @@ if __name__ == '__main__':
         des_2 = y.read(s_2)
 
         diff = y.compare(des_1, des_2)
-        print(diff)
+
         y.render(diff)
+        py.render(diff)

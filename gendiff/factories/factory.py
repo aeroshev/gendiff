@@ -1,49 +1,43 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 
-from gendiff.products.product_json import PlainJSON, JsonJSON
-from gendiff.products.product_yaml import PlainYAML, JsonYAML
-from gendiff.products.product_config import PlainCONFIG, JsonCONFIG
+from gendiff.products.product_json import PlainJSON, NestedJSON
+from gendiff.products.product_yaml import PlainYAML, NestedYAML
+from gendiff.products.product_config import PlainCONFIG, NestedCONFIG
 
 
 class AbstractFactory(ABC):
 
-    @staticmethod
-    def create_plain():
+    @abstractmethod
+    def create_nested(self):
         pass
 
-    @staticmethod
-    def create_json():
+    @abstractmethod
+    def create_plain(self):
         pass
 
 
 class FactoryJSON(AbstractFactory):
 
-    @staticmethod
-    def create_plain() -> PlainJSON:
+    def create_plain(self) -> PlainJSON:
         return PlainJSON()
 
-    @staticmethod
-    def create_json() -> JsonJSON:
-        return JsonJSON()
+    def create_nested(self) -> NestedJSON:
+        return NestedJSON()
 
 
 class FactoryYAML(AbstractFactory):
 
-    @staticmethod
-    def create_plain() -> PlainYAML:
+    def create_plain(self) -> PlainYAML:
         return PlainYAML()
 
-    @staticmethod
-    def create_json() -> JsonYAML:
-        return JsonYAML()
+    def create_nested(self) -> NestedYAML:
+        return NestedYAML()
 
 
 class FactoryCONFIG(AbstractFactory):
 
-    @staticmethod
-    def create_plain() -> PlainCONFIG:
+    def create_plain(self) -> PlainCONFIG:
         return PlainCONFIG()
 
-    @staticmethod
-    def create_json() -> JsonCONFIG:
-        return JsonCONFIG()
+    def create_nested(self) -> NestedCONFIG:
+        return NestedCONFIG()

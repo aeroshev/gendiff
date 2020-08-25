@@ -93,7 +93,7 @@ class PlainJSON(AbstractJSON):
         print(f'{Fore.WHITE}', end='')
 
 
-class JsonJSON(AbstractJSON):
+class NestedJSON(AbstractJSON):
 
     __slots__ = ('deep', 'ast')
 
@@ -102,15 +102,23 @@ class JsonJSON(AbstractJSON):
         self.ast = set()
         init()
 
+    def decompot(self, object_):
+        if isinstance(object_, dict):
+            key, contain = [i for i in object_.items()][0]
+            value = '{\n' + (self.deep + 1)*' ' + f'{key}: {contain}\n' + self.deep*' ' + '}'
+        else:
+            value = object_
+        return value
+
     def render(self, result: set):
         for item in result:
             if item.state == 'insert':
-                print(self.deep*' ' + f'{Fore.GREEN}+ {item.param}: {item.value}')
+                print(self.deep*' ' + f'{Fore.GREEN}+ {item.param}: {self.decompot(item.value)}')
             elif item.state == 'delete':
-                print(self.deep*' ' + f'{Fore.RED}- {item.param}: {item.value}')
+                print(self.deep*' ' + f'{Fore.RED}- {item.param}: {self.decompot(item.value)}')
             elif item.state == 'update':
-                print(self.deep*' ' + f'{Fore.RED}- {item.param}: {item.value[0]}')
-                print(self.deep*' ' + f'{Fore.GREEN}+ {item.param}: {item.value[1]}')
+                print(self.deep*' ' + f'{Fore.RED}- {item.param}: {self.decompot(item.value[0])}')
+                print(self.deep*' ' + f'{Fore.GREEN}+ {item.param}: {self.decompot(item.value[1])}')
             elif item.state == 'children':
                 print(Fore.WHITE + self.deep*' ' + f'{item.param}: ' + '{')
 

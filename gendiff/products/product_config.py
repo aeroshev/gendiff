@@ -14,7 +14,7 @@ class PlainCONFIG(AbstractCONFIG):
         pass
 
 
-class JsonCONFIG(AbstractCONFIG):
+class NestedCONFIG(AbstractCONFIG):
 
     def read(self):
         pass
