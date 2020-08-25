@@ -14,8 +14,8 @@ def get_concrete_factory(file_type: str) -> AbstractFactory:
 
 def get_concrete_product(factory: AbstractFactory, format_: str):
     product = None
-    if format_ == 'json':
-        product = factory.create_json()
+    if format_ == 'nested':
+        product = factory.create_nested()
     elif format_ == 'plain':
         product = factory.create_plain()
     return product

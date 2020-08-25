@@ -16,7 +16,7 @@ def print_version(ctx, param, value):
 @click.command(context_settings=CONTEXT_SETTINGS)
 @click.option('-v', '--version', required=False, is_flag=True, callback=print_version, expose_value=False,
               is_eager=True, help='output the version program')
-@click.option('-f', '--format', required=False, default='json', help='output format')
+@click.option('-f', '--format', required=False, default='nested', help='output format')
 @click.argument('first_config', type=click.File('r'))
 @click.argument('second_config', type=click.File('r'))
 def cli(format, first_config, second_config):
