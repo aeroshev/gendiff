@@ -1,61 +1,30 @@
-
-  {
-    "_id": "5f4012c431e9a7148e9fd1ef",
-    "guid": "77a4535a-e20b-4c48-8b43-fca252645212",
-    "isActive": true,
-    "balance": "$3,754.48",
-    "picture": "http://placehold.it/32x32",
-    "age": 34,
-    "hairColor": "blond",
-    "eyeColor": "green",
-    "fingerColor": "usually",
-    "name": {
-      "first": "Jayne",
-      "last": "Ray",
-      "bio": {
-        "history": "Something"
-      }
+{
+  "common": {
+    "setting1": "Value 1",
+    "setting3": {
+      "key": "value"
     },
-    "company": "ANDRYX",
-    "email": "jayne.ray@andryx.info",
-    "phone": "+1 (807) 430-3661",
-    "address": "824 Dodworth Street, Newry, Arkansas, 1795",
-    "about": "Irure consectetur sunt irure ea velit nisi occaecat elit aliquip consectetur elit culpa culpa. Velit deserunt mollit reprehenderit consequat laboris laboris. Consectetur reprehenderit qui qui eu enim esse in proident culpa Lorem. Ut incididunt in id sunt occaecat amet magna irure velit voluptate excepteur enim.",
-    "registered": "Monday, August 10, 2015 8:06 AM",
-    "latitude": "55.763557",
-    "longitude": "1.589859",
-    "tags": [
-      "quis",
-      "laborum",
-      "eiusmod",
-      "fugiat",
-      "nulla"
-    ],
-    "range": [
-      0,
-      1,
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9
-    ],
-    "friends": [
-      {
-        "id": 0,
-        "name": "Queen Clarke"
-      },
-      {
-        "id": 1,
-        "name": "Watson Fitzpatrick"
-      },
-      {
-        "id": 2,
-        "name": "Lester Gillespie"
-      }
-    ],
-    "favoriteFruit": "apple"
+    "setting4": "blah blah",
+    "setting5": {
+      "key5": "value5"
+    },
+    "setting6": {
+      "key": "value",
+      "ops": "vops"
+    }
+  },
+
+  "group1": {
+    "foo": "bar",
+    "baz": "bars",
+    "nest": "str"
+  },
+
+  "group3": {
+    "fee": "100500"
+  },
+
+  "groupEqual": {
+    "prop1": "1"
   }
+}

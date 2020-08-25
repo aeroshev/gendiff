@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 import json
 from colorama import init, Fore
 from gendiff.generator_ast.components import Component
-from jsondiff import diff
 
 
 class AbstractJSON(ABC):
@@ -42,21 +41,25 @@ class AbstractJSON(ABC):
             old_in_new = input_2_json.get(item_1)  # 1
             new_in_old = input_1_json.get(item_2)  # 2
             old_in_old = input_1_json.get(item_1)  # 3
-            new_in_new = input_2_json.get(item_2)  # 4
+            # new_in_new = input_2_json.get(item_2)  # 4
 
             if new_in_old is None:
-                self.ast.append(Component(item_2, 'insert', input_2_json[item_2]))
+                self.ast.add(Component(item_2, 'insert', input_2_json[item_2]))
             if old_in_new is None:
-                self.ast.append(Component(item_1, 'delete', input_1_json[item_1]))
+                self.ast.add(Component(item_1, 'delete', input_1_json[item_1]))
             if not (old_in_new is None) and not (old_in_old is None) and old_in_new != old_in_old:
                 if isinstance(old_in_old, dict) and isinstance(old_in_new, dict):
                     store = self.ast
-                    self.ast = []
+                    self.ast = set()
                     new_ = self.compare(old_in_old, old_in_new)
                     self.ast = store
-                    self.ast.append(Component(item_1, 'children', new_))
+                    object_ = Component(item_1, 'children', new_)
+                    if object_ not in self.ast:
+                        self.ast.add(object_)
                 else:
-                    self.ast.append(Component(item_1, 'update', [old_in_old, old_in_new]))
+                    object_ = Component(item_1, 'update', (old_in_old, old_in_new))
+                    if object_ not in self.ast:
+                        self.ast.add(object_)
 
         return self.ast
 
@@ -102,7 +105,7 @@ class JsonJSON(AbstractJSON):
     def __init__(self):
         self.color = Fore.WHITE
         self.deep = 0
-        self.ast = []
+        self.ast = set()
         init()
 
     def render(self, result):

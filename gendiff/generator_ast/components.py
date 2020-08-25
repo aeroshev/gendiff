@@ -11,4 +11,13 @@ class Component:
         return f'{self.param}, {self.state}, {self.value}'
 
     def __repr__(self):
-        return f'{self.param}, {self.state}, {self.value}'
+        return f'( {self.param}, {self.state}, {self.value} )'
+
+    def __eq__(self, other):
+        if self.param == other.param and self.state == other.state and self.value == other.value:
+            return True
+        else:
+            return False
+
+    def __hash__(self):
+        return hash(self.param) + hash(self.state)
