@@ -8,28 +8,22 @@ from gendiff.products.product_config import PlainCONFIG, NestedCONFIG
 class AbstractFactory(ABC):
 
     @abstractmethod
-    def create_json(self):
+    def create_plain(self):
         pass
 
     @abstractmethod
-    def create_yaml(self):
-        pass
-
-    @abstractmethod
-    def create_config(self):
+    def create_nested(self):
         pass
 
 
-class FactoryNested(AbstractFactory):
+class FactoryJSON(AbstractFactory):
+    pass
 
-    def create_json(self) -> NestedJSON:
-        return NestedJSON()
+class FactoryYAML(AbstractFactory):
+    pass
 
-    def create_yaml(self) -> NestedYAML:
-        return NestedYAML()
+class FactoryCONFIG()
 
-    def create_config(self) -> NestedCONFIG:
-        return NestedCONFIG()
 
 
 class FactoryPlain(AbstractFactory):
