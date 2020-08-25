@@ -10,6 +10,9 @@ class AbstractCONFIG(ABC):
     def read(self, data: str):
         return self.parser.read(data)
 
+    def compare(self):
+        pass
+
     @abstractmethod
     def render(self):
         pass
