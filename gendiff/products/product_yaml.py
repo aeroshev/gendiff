@@ -6,8 +6,10 @@ from colorama import init, Fore
 
 class AbstractYAML(ABC):
 
-    @staticmethod
-    def read(data: str):
+    def __init__(self):
+        self.ast = set()
+
+    def read(self, data: str):
         return yaml.load(data, yaml.Loader)
 
     def compare(self, input_1_yaml, input_2_yaml):
@@ -67,7 +69,7 @@ class PlainYAML(AbstractYAML):
     __slots__ = ('ast', 'path')
 
     def __init__(self):
-        self.ast = set()
+        super().__init__()
         self.path = []
         init()
 
@@ -98,8 +100,8 @@ class NestedYAML(AbstractYAML):
     __slots__ = ('deep', 'ast')
 
     def __init__(self):
+        super().__init__()
         self.deep = 0
-        self.ast = set()
         init()
 
     def decompot(self, object_):

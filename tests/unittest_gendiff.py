@@ -5,6 +5,7 @@ import unittest
 import os
 import json
 import yaml
+import configparser
 
 
 def desereliaze(data, type_: str):
@@ -13,6 +14,8 @@ def desereliaze(data, type_: str):
         res = json.loads(data)
     elif type_ == 'yaml':
         res = yaml.load(data, yaml.Loader)
+    elif type_ == 'ini':
+        pass
     return res
 
 
@@ -33,6 +36,7 @@ def read_data_from_file(format_: str, type_: str):
 
 
 class TestSuit(unittest.TestCase):
+
     reference_ast = {Component('group3', 'insert', {'fee': '100500'}),
                      Component('group2', 'delete', {'abc': '12345'}),
                      Component('group1', 'children', {
@@ -71,6 +75,9 @@ class TestSuit(unittest.TestCase):
         ast = product.compare(data_1, data_2)
 
         self.assertSetEqual(self.reference_ast, ast)
+
+    def test_case_diff_config(self):
+        pass
 
 
 if __name__ == '__main__':

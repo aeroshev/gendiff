@@ -6,8 +6,10 @@ from gendiff.generator_ast.components import Component
 
 class AbstractJSON(ABC):
 
-    @staticmethod
-    def read(data: str):
+    def __init__(self):
+        self.ast = set()
+
+    def read(self, data: str):
         return json.loads(data)
 
     def compare(self, input_1_json, input_2_json):
@@ -67,7 +69,7 @@ class PlainJSON(AbstractJSON):
     __slots__ = ('ast', 'path')
 
     def __init__(self):
-        self.ast = set()
+        super().__init__()
         self.path = []
         init()
 
@@ -98,8 +100,8 @@ class NestedJSON(AbstractJSON):
     __slots__ = ('deep', 'ast')
 
     def __init__(self):
+        super().__init__()
         self.deep = 0
-        self.ast = set()
         init()
 
     def decompot(self, object_):

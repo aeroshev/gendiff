@@ -6,6 +6,4 @@ dist
 *.7z
 __pycache__/
 *.txt
-*.yaml
-*.ini
 .pytest*

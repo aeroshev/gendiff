@@ -8,6 +8,8 @@ setup(
     include_package_data=True,
     install_requires=[
         'Click',
+        'PyYAML',
+        'Colorama'
     ],
     entry_points={
         'console_scripts': [
