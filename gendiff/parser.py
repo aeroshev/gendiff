@@ -4,10 +4,11 @@
 """
 from typing import Optional, TextIO
 
-from gendiff.factories.factory import FactoryNested, FactoryPlain, AbstractFactory
+from gendiff.factories.factory import (AbstractFactory, FactoryNested,
+                                       FactoryPlain)
+from gendiff.products.product_config import AbstractCONFIG
 from gendiff.products.product_json import AbstractJSON
 from gendiff.products.product_yaml import AbstractYAML
-from gendiff.products.product_config import AbstractCONFIG
 
 
 def get_concrete_product(factory: AbstractFactory,

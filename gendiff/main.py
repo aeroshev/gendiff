@@ -1,12 +1,12 @@
 """
 Этот модуль является точкой входа в консольный скрипт gendiff
 """
-import click
-import pkg_resources
 from typing import TextIO
 
-from gendiff.parser import parse
+import click
+import pkg_resources
 
+from gendiff.parser import parse
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 

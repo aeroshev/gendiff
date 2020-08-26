@@ -1,8 +1,8 @@
 """
 Содержит в себе класс Component необходимый для построения AST дерева
 """
-from typing import Union
 from enum import Enum, unique
+from typing import Union
 
 
 @unique

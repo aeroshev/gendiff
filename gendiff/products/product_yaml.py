@@ -6,9 +6,9 @@
 в абстрактном классе
 """
 from abc import ABC, abstractmethod
-import yaml
-from colorama import init, Fore
 
+import yaml
+from colorama import Fore, init
 from gendiff.generator_ast.components import Component, ComponentState
 
 

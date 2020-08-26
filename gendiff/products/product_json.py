@@ -5,11 +5,11 @@
 Все общие методы для обоих классов определены
 в абстрактном классе
 """
-from abc import ABC, abstractmethod
 import json
-from colorama import init, Fore
+from abc import ABC, abstractmethod
 from typing import List, Union
 
+from colorama import Fore, init
 from gendiff.generator_ast.components import Component, ComponentState
 
 

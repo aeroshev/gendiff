@@ -5,8 +5,8 @@
 Все общие методы для обоих классов определены
 в абстрактном классе
 """
-from abc import ABC, abstractmethod
 import configparser
+from abc import ABC, abstractmethod
 
 
 class AbstractCONFIG(ABC):

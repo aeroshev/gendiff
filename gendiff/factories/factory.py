@@ -5,9 +5,9 @@ PlainFactory - печать результата в плоском стиле
 """
 from abc import ABC, abstractmethod
 
-from gendiff.products.product_json import PlainJSON, NestedJSON
-from gendiff.products.product_yaml import PlainYAML, NestedYAML
-from gendiff.products.product_config import PlainCONFIG, NestedCONFIG
+from gendiff.products.product_config import NestedCONFIG, PlainCONFIG
+from gendiff.products.product_json import NestedJSON, PlainJSON
+from gendiff.products.product_yaml import NestedYAML, PlainYAML
 
 
 class AbstractFactory(ABC):
