@@ -1,6 +1,17 @@
 """
 Содержит в себе класс Component необходимый для построения AST дерева
 """
+from typing import Union
+from enum import Enum, unique
+
+
+@unique
+class ComponentState(Enum):
+    DEFAULT = 1
+    INSERT = 2
+    DELETE = 3
+    UPDATE = 4
+    CHILDREN = 5
 
 
 class Component:
@@ -18,10 +29,10 @@ class Component:
 
     __slots__ = ('param', 'state', 'value')
 
-    def __init__(self, param='default', state='default', value='default'):
-        self.param = param
-        self.state = state
-        self.value = value
+    def __init__(self, param='default', state=ComponentState.DEFAULT, value='default'):
+        self.param: str = param
+        self.state: ComponentState = state
+        self.value: Union[str, dict, set, tuple] = value
 
     def __str__(self):
         return f'{self.param}, {self.state}, {self.value}'

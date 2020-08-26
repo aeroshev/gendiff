@@ -3,6 +3,7 @@
 """
 import click
 import pkg_resources
+from typing import TextIO
 
 from gendiff.parser import parse
 
@@ -10,7 +11,7 @@ from gendiff.parser import parse
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 
-def print_version(ctx, value):
+def print_version(ctx, value) -> None:
     """
     Узнаёт версию программы просматривая файл setup.py
     :param ctx:
@@ -30,7 +31,7 @@ def print_version(ctx, value):
 @click.option('-f', '--format', required=False, default='nested', help='output format')
 @click.argument('first_config', type=click.File('r'))
 @click.argument('second_config', type=click.File('r'))
-def cli(format, first_config, second_config):
+def cli(format: str, first_config: TextIO, second_config: TextIO):
     """
     Compares two configuration files and shows a difference.
     """

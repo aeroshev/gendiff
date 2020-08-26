@@ -2,10 +2,16 @@
 Этот модуль содержит функции которые занимаются обработкой входных параметров и
 выбором продукта для обработки файлов
 """
+from typing import Optional, TextIO
+
 from gendiff.factories.factory import FactoryNested, FactoryPlain, AbstractFactory
+from gendiff.products.product_json import AbstractJSON
+from gendiff.products.product_yaml import AbstractYAML
+from gendiff.products.product_config import AbstractCONFIG
 
 
-def get_concrete_product(factory: AbstractFactory, file_type: str):
+def get_concrete_product(factory: AbstractFactory,
+                         file_type: str) -> Optional[AbstractJSON, AbstractYAML, AbstractCONFIG]:
     """
     За счёт полученного расширения файла определяет какой конкретный продукт
     необходимо получить
@@ -23,7 +29,7 @@ def get_concrete_product(factory: AbstractFactory, file_type: str):
     return product
 
 
-def get_concrete_factory(format_: str) -> AbstractFactory:
+def get_concrete_factory(format_: str) -> Optional[AbstractFactory]:
     """
     По полученному формата возращает фабрику из семейсива Nested или Plain
     :param format_: nested - default or plain
@@ -37,7 +43,7 @@ def get_concrete_factory(format_: str) -> AbstractFactory:
     return factory
 
 
-def read_file(file_name) -> str:
+def read_file(file_name: TextIO) -> str:
     """
     Чтение файла.
     Контекстный оператор не используется, т.к. click сам открывает файл
@@ -47,7 +53,7 @@ def read_file(file_name) -> str:
     return file_name.read()
 
 
-def parse(first_config, second_config, format_):
+def parse(first_config: TextIO, second_config: TextIO, format_: str) -> str:
     """
     Происходит основная частьсв работы.
     Содержит в себе вызовы функций чтения из файла, десериализации, сравнения
@@ -73,7 +79,10 @@ def parse(first_config, second_config, format_):
         desirealize_2 = product.read(second_data)
 
         diff = product.compare(desirealize_1, desirealize_2)
-        product.render(diff)
+        try:
+            product.render(diff)
+        except TypeError:
+            status = 'Render was stopped with error'
     else:
         status = 'Not equal format file'
     return status

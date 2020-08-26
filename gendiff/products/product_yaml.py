@@ -9,7 +9,7 @@ from abc import ABC, abstractmethod
 import yaml
 from colorama import init, Fore
 
-from gendiff.generator_ast.components import Component
+from gendiff.generator_ast.components import Component, ComponentState
 
 
 class AbstractYAML(ABC):
@@ -66,20 +66,20 @@ class AbstractYAML(ABC):
             # new_in_new = input_2_json.get(item_2)  # 4
 
             if new_in_old is None:
-                self.ast.add(Component(item_2, 'insert', input_2_yaml[item_2]))
+                self.ast.add(Component(item_2, ComponentState.INSERT, input_2_yaml[item_2]))
             if old_in_new is None:
-                self.ast.add(Component(item_1, 'delete', input_1_yaml[item_1]))
+                self.ast.add(Component(item_1, ComponentState.DELETE, input_1_yaml[item_1]))
             if not (old_in_new is None) and not (old_in_old is None) and old_in_new != old_in_old:
                 if isinstance(old_in_old, dict) and isinstance(old_in_new, dict):
                     store = self.ast
                     self.ast = set()
                     new_ = self.compare(old_in_old, old_in_new)
                     self.ast = store
-                    object_ = Component(item_1, 'children', new_)
+                    object_ = Component(item_1, ComponentState.CHILDREN, new_)
                     if object_ not in self.ast:
                         self.ast.add(object_)
                 else:
-                    object_ = Component(item_1, 'update', (old_in_old, old_in_new))
+                    object_ = Component(item_1, ComponentState.UPDATE, (old_in_old, old_in_new))
                     if object_ not in self.ast:
                         self.ast.add(object_)
 
@@ -110,17 +110,17 @@ class PlainYAML(AbstractYAML):
         complex_value = '[complex value]'
         for item in result:
             self.path.append(item.param)
-            if item.state == 'insert':
+            if item.state == ComponentState.INSERT:
                 print(f'{Fore.WHITE}Property '
                       f'{Fore.GREEN}\'{".".join(self.path)}\''
                       f'{Fore.WHITE} was added with value: '
                       f'{Fore.GREEN}'
                       f'{complex_value if isinstance(item.value, dict) else item.value}')
-            elif item.state == 'delete':
+            elif item.state == ComponentState.DELETE:
                 print(f'{Fore.WHITE}Property '
                       f'{Fore.RED}\'{".".join(self.path)}\''
                       f'{Fore.WHITE} was removed')
-            elif item.state == 'update':
+            elif item.state == ComponentState.UPDATE:
                 print(f'{Fore.WHITE}Property '
                       f'{Fore.YELLOW}\'{".".join(self.path)}\'{Fore.WHITE} was updated. From '
                       f'{Fore.RED}'
@@ -128,7 +128,7 @@ class PlainYAML(AbstractYAML):
                       f'{Fore.WHITE}to '
                       f'{Fore.GREEN}'
                       f'{complex_value if isinstance(item.value[1], dict) else item.value[1]}')
-            elif item.state == 'children':
+            elif item.state == ComponentState.CHILDREN:
                 self.render(item.value)
             else:
                 raise TypeError
@@ -163,14 +163,14 @@ class NestedYAML(AbstractYAML):
 
     def render(self, result):
         for item in result:
-            if item.state == 'insert':
+            if item.state == ComponentState.INSERT:
                 print(self.deep*' ' + f'{Fore.GREEN}+ {item.param}: {self.decompot(item.value)}')
-            elif item.state == 'delete':
+            elif item.state == ComponentState.DELETE:
                 print(self.deep*' ' + f'{Fore.RED}- {item.param}: {self.decompot(item.value)}')
-            elif item.state == 'update':
+            elif item.state == ComponentState.UPDATE:
                 print(self.deep*' ' + f'{Fore.RED}- {item.param}: {self.decompot(item.value[0])}')
                 print(self.deep*' ' + f'{Fore.GREEN}+ {item.param}: {self.decompot(item.value[1])}')
-            elif item.state == 'children':
+            elif item.state == ComponentState.CHILDREN:
                 print(Fore.WHITE + self.deep*' ' + f'{item.param}:')
 
                 self.deep += 2
