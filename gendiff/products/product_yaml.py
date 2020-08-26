@@ -1,19 +1,45 @@
+"""
+Этот модуль содержит в себе продукты типа YAML
+Различие этих классов заключается в разном
+типе рендеринга результата
+Все общие методы для обоих классов определены
+в абстрактном классе
+"""
 from abc import ABC, abstractmethod
 import yaml
-from gendiff.generator_ast.components import Component
 from colorama import init, Fore
+
+from gendiff.generator_ast.components import Component
 
 
 class AbstractYAML(ABC):
-
+    """
+    Абстрактный класс семейства продуктов YAML
+    Определяет в себе общие методы для всех наследников и
+    асбтрактные методы, которые необходимо переопределить
+    для различных продуктов
+    """
     def __init__(self):
         self.ast = set()
 
-    def read(self, data: str):
+    @staticmethod
+    def read(data: str):
+        """
+        Десериализация строковых данных в python формат
+        :param data: данные из файла
+        :return: словарик словариков
+        """
         return yaml.load(data, yaml.Loader)
 
     def compare(self, input_1_yaml, input_2_yaml):
-        iter_1 = iter(input_1_yaml,)
+        """
+        Главная функция построения AST различий файлов
+        Имеет рекусривный вызов для вложенных структур
+        :param input_1_yaml: десериализованые данные из первого файла
+        :param input_2_yaml: десериализованые данные из второго файла
+        :return: множество Component
+        """
+        iter_1 = iter(input_1_yaml)
         iter_2 = iter(input_2_yaml)
 
         while True:
@@ -61,11 +87,18 @@ class AbstractYAML(ABC):
 
     @abstractmethod
     def render(self, result):
-        pass
+        """
+        Вывод различий в терминал пользавателю
+        В каждом классе определяется свой стиль
+        :param result: AST различий
+        :return:
+        """
 
 
 class PlainYAML(AbstractYAML):
-
+    """
+    Класс переопределяющий метод render для плоского вывода результат
+    """
     __slots__ = ('ast', 'path')
 
     def __init__(self):
@@ -78,15 +111,23 @@ class PlainYAML(AbstractYAML):
         for item in result:
             self.path.append(item.param)
             if item.state == 'insert':
-                print(f'{Fore.WHITE}Property {Fore.GREEN}\'{".".join(self.path)}\'{Fore.WHITE} was added with value: '
-                      f'{Fore.GREEN}{complex_value if isinstance(item.value, dict) else item.value}')
+                print(f'{Fore.WHITE}Property '
+                      f'{Fore.GREEN}\'{".".join(self.path)}\''
+                      f'{Fore.WHITE} was added with value: '
+                      f'{Fore.GREEN}'
+                      f'{complex_value if isinstance(item.value, dict) else item.value}')
             elif item.state == 'delete':
-                print(f'{Fore.WHITE}Property {Fore.RED}\'{".".join(self.path)}\'{Fore.WHITE} was removed')
+                print(f'{Fore.WHITE}Property '
+                      f'{Fore.RED}\'{".".join(self.path)}\''
+                      f'{Fore.WHITE} was removed')
             elif item.state == 'update':
-                print(f'{Fore.WHITE}Property {Fore.YELLOW}\'{".".join(self.path)}\'{Fore.WHITE} was updated. From '
-                      f'{Fore.RED}{complex_value if isinstance(item.value[0], dict) else item.value[0]} '
+                print(f'{Fore.WHITE}Property '
+                      f'{Fore.YELLOW}\'{".".join(self.path)}\'{Fore.WHITE} was updated. From '
+                      f'{Fore.RED}'
+                      f'{complex_value if isinstance(item.value[0], dict) else item.value[0]} '
                       f'{Fore.WHITE}to '
-                      f'{Fore.GREEN}{complex_value if isinstance(item.value[1], dict) else item.value[1]}')
+                      f'{Fore.GREEN}'
+                      f'{complex_value if isinstance(item.value[1], dict) else item.value[1]}')
             elif item.state == 'children':
                 self.render(item.value)
             else:
@@ -96,7 +137,9 @@ class PlainYAML(AbstractYAML):
 
 
 class NestedYAML(AbstractYAML):
-
+    """
+    Класс переопределяющий метод render для вложенного вывода результат
+    """
     __slots__ = ('deep', 'ast')
 
     def __init__(self):
@@ -105,14 +148,20 @@ class NestedYAML(AbstractYAML):
         init()
 
     def decompot(self, object_):
+        """
+        Декомпозиция value из Component словаря
+        для pretty print
+        :param object_: some value from Component
+        :return: pretty string
+        """
         if isinstance(object_, dict):
-            key, contain = [i for i in object_.items()][0]
+            key, contain = [*object_.items()][0]
             value = '\n' + (self.deep + 4)*' ' + f'{key}: {contain}'
         else:
             value = object_
         return value
 
-    def render(self, result: set):
+    def render(self, result):
         for item in result:
             if item.state == 'insert':
                 print(self.deep*' ' + f'{Fore.GREEN}+ {item.param}: {self.decompot(item.value)}')

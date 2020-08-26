@@ -1,14 +1,23 @@
-from gendiff.products.product_json import NestedJSON
-from gendiff.products.product_yaml import NestedYAML
-from gendiff.generator_ast.components import Component
+"""
+Этот модуль содержит в себе юнит тесты для консольного скрипта gendiff
+"""
 import unittest
 import os
 import json
 import yaml
-import configparser
+
+from gendiff.products.product_json import NestedJSON
+from gendiff.products.product_yaml import NestedYAML
+from gendiff.generator_ast.components import Component
 
 
-def desereliaze(data, type_: str):
+def desereliaze(data: str, type_: str):
+    """
+    Десериализация файловых данных в python тип
+    :param data:
+    :param type_:
+    :return:
+    """
     res = None
     if type_ == 'json':
         res = json.loads(data)
@@ -20,6 +29,12 @@ def desereliaze(data, type_: str):
 
 
 def read_data_from_file(format_: str, type_: str):
+    """
+    Безопасное открытие файлов и чтение данных из тестовых фикстур
+    :param format_: json, yaml, ini
+    :param type_: plain, nested
+    :return: tuple with data
+    """
     project_dir = os.path.dirname(os.path.dirname(__file__))
     files_dir = os.path.join(project_dir, "test_files/" + format_)
 
@@ -36,7 +51,9 @@ def read_data_from_file(format_: str, type_: str):
 
 
 class TestSuit(unittest.TestCase):
-
+    """
+    Класс проверки функций построения AST различий
+    """
     reference_ast = {Component('group3', 'insert', {'fee': '100500'}),
                      Component('group2', 'delete', {'abc': '12345'}),
                      Component('group1', 'children', {
@@ -62,6 +79,10 @@ class TestSuit(unittest.TestCase):
                      })}
 
     def test_case_diff_json(self):
+        """
+        Тест кейс для JSON типа
+        :return:
+        """
         product = NestedJSON()
         data_1, data_2 = read_data_from_file('nested', 'json')
         ast = product.compare(data_1, data_2)
@@ -69,6 +90,10 @@ class TestSuit(unittest.TestCase):
         self.assertSetEqual(self.reference_ast, ast)
 
     def test_case_diff_yaml(self):
+        """
+        Тест кейс для YAML типа
+        :return:
+        """
         product = NestedYAML()
 
         data_1, data_2 = read_data_from_file('nested', 'yaml')
@@ -77,7 +102,10 @@ class TestSuit(unittest.TestCase):
         self.assertSetEqual(self.reference_ast, ast)
 
     def test_case_diff_config(self):
-        pass
+        """
+        Тест кейс для INI типа
+        :return:
+        """
 
 
 if __name__ == '__main__':

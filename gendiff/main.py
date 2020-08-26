@@ -1,12 +1,22 @@
+"""
+Этот модуль является точкой входа в консольный скрипт gendiff
+"""
 import click
-from gendiff.parser import parse
 import pkg_resources
+
+from gendiff.parser import parse
 
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 
-def print_version(ctx, param, value):
+def print_version(ctx, value):
+    """
+    Узнаёт версию программы просматривая файл setup.py
+    :param ctx:
+    :param value:
+    :return: nothing
+    """
     if not value or ctx.resilient_parsing:
         return
     version = pkg_resources.require("gendiff")[0].version
@@ -15,8 +25,8 @@ def print_version(ctx, param, value):
 
 
 @click.command(context_settings=CONTEXT_SETTINGS)
-@click.option('-v', '--version', required=False, is_flag=True, callback=print_version, expose_value=False,
-              is_eager=True, help='output the version program')
+@click.option('-v', '--version', required=False, is_flag=True, callback=print_version,
+              expose_value=False, is_eager=True, help='output the version program')
 @click.option('-f', '--format', required=False, default='nested', help='output format')
 @click.argument('first_config', type=click.File('r'))
 @click.argument('second_config', type=click.File('r'))

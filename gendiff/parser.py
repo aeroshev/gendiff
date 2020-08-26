@@ -1,7 +1,18 @@
+"""
+Этот модуль содержит функции которые занимаются обработкой входных параметров и
+выбором продукта для обработки файлов
+"""
 from gendiff.factories.factory import FactoryNested, FactoryPlain, AbstractFactory
 
 
 def get_concrete_product(factory: AbstractFactory, file_type: str):
+    """
+    За счёт полученного расширения файла определяет какой конкретный продукт
+    необходимо получить
+    :param factory: Nested* or Plain* фабрика
+    :param file_type: расширение файла
+    :return: product (*JSON, *YAML, *CONFIG)
+    """
     product = None
     if file_type == 'json':
         product = factory.create_json()
@@ -13,6 +24,11 @@ def get_concrete_product(factory: AbstractFactory, file_type: str):
 
 
 def get_concrete_factory(format_: str) -> AbstractFactory:
+    """
+    По полученному формата возращает фабрику из семейсива Nested или Plain
+    :param format_: nested - default or plain
+    :return: factory (Nested or Plain)
+    """
     factory = None
     if format_ == 'nested':
         factory = FactoryNested()
@@ -22,12 +38,29 @@ def get_concrete_factory(format_: str) -> AbstractFactory:
 
 
 def read_file(file_name) -> str:
+    """
+    Чтение файла.
+    Контекстный оператор не используется, т.к. click сам открывает файл
+    :param file_name:
+    :return: data from file
+    """
     return file_name.read()
 
 
 def parse(first_config, second_config, format_):
+    """
+    Происходит основная частьсв работы.
+    Содержит в себе вызовы функций чтения из файла, десериализации, сравнения
+    и рендера результата сравнения
+    :param first_config: file name
+    :param second_config: file name
+    :param format_: type printing
+    :return: status
+    """
     f_format_file = first_config.name.split('.')[-1]
     s_format_file = second_config.name.split('.')[-1]
+
+    status = 'Good'
 
     if f_format_file == s_format_file:
         factory = get_concrete_factory(format_)
@@ -41,7 +74,6 @@ def parse(first_config, second_config, format_):
 
         diff = product.compare(desirealize_1, desirealize_2)
         product.render(diff)
-
-        return 'Good'
     else:
-        return 'Not equal format file'
+        status = 'Not equal format file'
+    return status
