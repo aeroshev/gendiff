@@ -1,14 +1,14 @@
 """
 Этот модуль содержит в себе юнит тесты для консольного скрипта gendiff
 """
-import unittest
 import os
 import json
 import yaml
+import pytest
 
 from gendiff.products.product_json import NestedJSON
 from gendiff.products.product_yaml import NestedYAML
-from gendiff.generator_ast.components import Component
+from gendiff.generator_ast.components import Component, ComponentState
 
 
 def desereliaze(data: str, type_: str):
@@ -50,63 +50,55 @@ def read_data_from_file(format_: str, type_: str):
         return des_data_1, des_data_2
 
 
-class TestSuit(unittest.TestCase):
-    """
-    Класс проверки функций построения AST различий
-    """
-    reference_ast = {Component('group3', 'insert', {'fee': '100500'}),
-                     Component('group2', 'delete', {'abc': '12345'}),
-                     Component('group1', 'children', {
-                         Component('baz', 'update', ('bas', 'bars')),
-                         Component('nest', 'update', (
-                             {'key': 'value'},
-                             'str'
-                         ))
+reference_ast = {Component('group3', ComponentState.INSERT, {'fee': '100500'}),
+                 Component('group2', ComponentState.DELETE, {'abc': '12345'}),
+                 Component('group1', ComponentState.CHILDREN, {
+                     Component('baz', ComponentState.UPDATE, ('bas', 'bars')),
+                     Component('nest', ComponentState.UPDATE, (
+                         {'key': 'value'},
+                         'str'
+                     ))
+                 }),
+                 Component('common', ComponentState.CHILDREN, {
+                     Component('setting2', ComponentState.DELETE, '200'),
+                     Component('setting3', ComponentState.UPDATE, (
+                         True,
+                         {'key': 'value'}
+                     )),
+                     Component('setting4', ComponentState.INSERT, 'blah blah'),
+                     Component('setting5', ComponentState.INSERT, {
+                         'key5': 'value5'
                      }),
-                     Component('common', 'children', {
-                         Component('setting2', 'delete', '200'),
-                         Component('setting3', 'update', (
-                             True,
-                             {'key': 'value'}
-                         )),
-                         Component('setting4', 'insert', 'blah blah'),
-                         Component('setting5', 'insert', {
-                             'key5': 'value5'
-                         }),
-                         Component('setting6', 'children', {
-                             Component('ops', 'insert', 'vops')
-                         })
-                     })}
-
-    def test_case_diff_json(self):
-        """
-        Тест кейс для JSON типа
-        :return:
-        """
-        product = NestedJSON()
-        data_1, data_2 = read_data_from_file('nested', 'json')
-        ast = product.compare(data_1, data_2)
-
-        self.assertSetEqual(self.reference_ast, ast)
-
-    def test_case_diff_yaml(self):
-        """
-        Тест кейс для YAML типа
-        :return:
-        """
-        product = NestedYAML()
-
-        data_1, data_2 = read_data_from_file('nested', 'yaml')
-        ast = product.compare(data_1, data_2)
-
-        self.assertSetEqual(self.reference_ast, ast)
-
-    def test_case_diff_config(self):
-        """
-        Тест кейс для INI типа
-        :return:
-        """
+                     Component('setting6', ComponentState.CHILDREN, {
+                         Component('ops', ComponentState.INSERT, 'vops')
+                     })
+                 })}
 
 
-if __name__ == '__main__':
-    unittest.main()
+def test_case_diff_json():
+    """
+    Тест кейс для JSON типа
+    :return:
+    """
+    product = NestedJSON()
+    ast = product.compare(*read_data_from_file('nested', 'json'))
+
+    assert reference_ast == ast
+
+
+def test_case_diff_yaml():
+    """
+    Тест кейс для YAML типа
+    :return:
+    """
+    product = NestedYAML()
+    ast = product.compare(*read_data_from_file('nested', 'yaml'))
+
+    assert reference_ast == ast
+
+
+def test_case_diff_config():
+    """
+    Тест кейс для INI типа
+    :return:
+    """
