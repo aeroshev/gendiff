@@ -3,11 +3,13 @@ import os
 import json
 import yaml
 
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Union
+
+from gendiff.factories.factory import FactoryNested, FactoryPlain, AbstractFactory
 
 from gendiff.products.abstract_product import AbstractProduct
-from gendiff.products.product_json import NestedJSON
-from gendiff.products.product_yaml import NestedYAML
+from gendiff.products.product_json import NestedJSON, PlainJSON
+from gendiff.products.product_yaml import NestedYAML, PlainYAML
 
 
 def deserialization(data: str, type_: str):
@@ -63,3 +65,39 @@ def setup_compare_test(request) -> Tuple[dict, dict, AbstractProduct]:
         des_data_1 = deserialization(data_1, request.param)
         des_data_2 = deserialization(data_2, request.param)
         return des_data_1, des_data_2, product
+
+
+@pytest.fixture(scope="function", params=[
+    'nested',
+    'plain',
+    'not_of_this'
+])
+def setup_get_product(request) -> Tuple[Optional[AbstractFactory], str]:
+    if request.param == 'nested':
+        return FactoryNested(), request.param
+    elif request.param == 'plain':
+        return FactoryPlain(), request.param
+    else:
+        return None, request.param
+
+
+@pytest.fixture(scope="function", params=[
+    'json',
+    'yaml'
+])
+def setup_decompot(request) -> Tuple[Union[NestedJSON, NestedYAML], str]:
+    if request.param == 'json':
+        return NestedJSON(), request.param
+    else:
+        return NestedYAML(), request.param
+
+
+@pytest.fixture(scope="function", params=[
+    'json',
+    'yaml'
+])
+def setup_is_complex(request) -> Union[PlainJSON, PlainYAML]:
+    if request.param == 'json':
+        return PlainJSON()
+    else:
+        return PlainYAML()
