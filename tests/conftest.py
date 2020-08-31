@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, Set
 
 import pytest
 import yaml
@@ -9,6 +9,7 @@ from gendiff.factories.factory import AbstractFactory, FactoryNested, FactoryPla
 from gendiff.products.abstract_product import AbstractProduct
 from gendiff.products.product_json import NestedJSON, PlainJSON
 from gendiff.products.product_yaml import NestedYAML, PlainYAML
+from gendiff.generator_ast.components import Component, ComponentState
 
 
 def deserialization(data: str, type_: str):
@@ -101,3 +102,8 @@ def setup_is_complex(request) -> Union[PlainJSON, PlainYAML]:
         return PlainJSON()
     else:
         return PlainYAML()
+
+
+@pytest.fixture(scope="function")
+def setup_render_test(request) -> Set[Component]:
+    invalid_ast: Set[Component] = {}

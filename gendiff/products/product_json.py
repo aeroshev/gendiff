@@ -7,7 +7,7 @@
 """
 import json
 from abc import abstractmethod
-from typing import Any, List, Union
+from typing import Any, List, Union, Set
 
 from colorama import Fore, init
 
@@ -33,7 +33,7 @@ class AbstractJSON(AbstractProduct):
         """
         return json.loads(data)
 
-    def compare(self, input_1_json: dict, input_2_json: dict) -> set:
+    def compare(self, input_1_json: dict, input_2_json: dict) -> Set[Component]:
         """
         Главная функция построения AST различий файлов
         Имеет рекусривный вызов для вложенных структур

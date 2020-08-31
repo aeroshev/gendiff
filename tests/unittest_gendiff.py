@@ -100,3 +100,7 @@ class TestGendiff:
             assert isinstance(factory, FactoryPlain)
         else:
             assert factory is None
+
+    def test_raise_in_render(self, setup_render_test):
+        diff = setup_render_test
+
