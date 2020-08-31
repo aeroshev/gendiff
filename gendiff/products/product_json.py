@@ -6,14 +6,15 @@
 в абстрактном классе
 """
 import json
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import List, Union
 
 from colorama import Fore, init
 from gendiff.generator_ast.components import Component, ComponentState
+from gendiff.products.abstract_product import AbstractProduct
 
 
-class AbstractJSON(ABC):
+class AbstractJSON(AbstractProduct):
     """
     Абстрактный класс семейства продуктов JSON
     Определяет в себе общие методы для всех наследников и
@@ -23,8 +24,7 @@ class AbstractJSON(ABC):
     def __init__(self):
         self.ast: set = set()
 
-    @staticmethod
-    def read(data: str) -> dict:
+    def read(self, data: str) -> dict:
         """
         Десериализация строковых данных в python формат
         :param data: данные из файла

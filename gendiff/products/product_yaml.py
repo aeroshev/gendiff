@@ -5,14 +5,15 @@
 Все общие методы для обоих классов определены
 в абстрактном классе
 """
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
 import yaml
 from colorama import Fore, init
 from gendiff.generator_ast.components import Component, ComponentState
+from gendiff.products.abstract_product import AbstractProduct
 
 
-class AbstractYAML(ABC):
+class AbstractYAML(AbstractProduct):
     """
     Абстрактный класс семейства продуктов YAML
     Определяет в себе общие методы для всех наследников и
@@ -22,8 +23,7 @@ class AbstractYAML(ABC):
     def __init__(self):
         self.ast = set()
 
-    @staticmethod
-    def read(data: str):
+    def read(self, data: str):
         """
         Десериализация строковых данных в python формат
         :param data: данные из файла

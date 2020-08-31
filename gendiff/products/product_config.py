@@ -6,10 +6,12 @@
 в абстрактном классе
 """
 import configparser
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+
+from gendiff.products.abstract_product import AbstractProduct
 
 
-class AbstractCONFIG(ABC):
+class AbstractCONFIG(AbstractProduct):
     """
     Абстрактный класс семейства продуктов INI
     Определяет в себе общие методы для всех наследников и
@@ -19,8 +21,7 @@ class AbstractCONFIG(ABC):
     def __init__(self):
         self.parser = configparser.ConfigParser()
 
-    @staticmethod
-    def read(data: str):
+    def read(self, data: str):
         """
         Десериализация строковых данных в python формат
         :param data: данные из файла
@@ -29,17 +30,17 @@ class AbstractCONFIG(ABC):
         parser = configparser.ConfigParser()
         parser.read(data)
 
-    def compare(self):
+    def compare(self, input_1_ini: dict, input_2_ini: dict):
         """
         Главная функция построения AST различий файлов
         Имеет рекусривный вызов для вложенных структур
-        :param input_1_yaml: десериализованые данные из первого файла
-        :param input_2_yaml: десериализованые данные из второго файла
+        :param input_1_ini: десериализованые данные из первого файла
+        :param input_2_ini: десериализованые данные из второго файла
         :return: множество Component
         """
 
     @abstractmethod
-    def render(self):
+    def render(self, result: set):
         """
         Вывод различий в терминал пользавателю
         В каждом классе определяется свой стиль
@@ -52,7 +53,7 @@ class PlainCONFIG(AbstractCONFIG):
     """
     Класс переопределяющий метод render для плоского вывода результат
     """
-    def render(self):
+    def render(self, result: set):
         pass
 
 
@@ -60,5 +61,5 @@ class NestedCONFIG(AbstractCONFIG):
     """
     Класс переопределяющий метод render для вложенного вывода результат
     """
-    def render(self):
+    def render(self, result: set):
         pass
