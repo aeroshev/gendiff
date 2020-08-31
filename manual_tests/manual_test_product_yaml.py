@@ -7,7 +7,7 @@ if __name__ == '__main__':
     py = PlainYAML()
 
     project_dir = os.path.dirname(os.path.dirname(__file__))
-    files_dir = os.path.join(project_dir, "test_files/nested")
+    files_dir = os.path.join(project_dir, "test_files")
 
     path_file_before = os.path.join(files_dir, "before.yaml")
     path_file_after = os.path.join(files_dir, "after.yaml")

@@ -1,12 +1,14 @@
 """
 Этот модуль содержит в себе юнит тесты для консольного скрипта gendiff
 """
+import pytest
 
 from gendiff.generator_ast.components import Component, ComponentState
 from gendiff.parser import get_concrete_factory, get_concrete_product
 from gendiff.products.product_config import NestedCONFIG, PlainCONFIG
 from gendiff.products.product_json import NestedJSON, PlainJSON
 from gendiff.products.product_yaml import NestedYAML, PlainYAML
+from gendiff.factories.factory import FactoryNested, FactoryPlain
 
 
 class TestGendiff:
@@ -57,7 +59,7 @@ class TestGendiff:
                    == product.decompot({'Hello, world': 'Hello, Python'})
         assert str(52) == product.decompot(52)
         assert str('Hello') == product.decompot('Hello')
-        assert str(45,) == product.decompot(45,)
+        assert str(45, ) == product.decompot(45, )
         assert str({'set'}) == product.decompot({'set'})
 
     def test_is_complex(self, setup_is_complex):
@@ -65,29 +67,36 @@ class TestGendiff:
         assert '[complex value]' == product.is_complex({'Hello': 'Hello'})
         assert str(52) == product.is_complex(52)
         assert str('Hello') == product.is_complex('Hello')
-        assert str(45,) == product.is_complex(45,)
+        assert str(45, ) == product.is_complex(45, )
         assert str({'set'}) == product.is_complex({'set'})
 
-    def test_func_get_concrete_product(self, setup_get_product):
+    @pytest.mark.parametrize("format_", ['json', 'yaml', 'config'])
+    def test_func_get_concrete_product(self, format_, setup_get_product):
         factory, type_test = setup_get_product
+        product = get_concrete_product(factory, format_)
         if type_test == 'nested':
-            product_json = get_concrete_product(factory, 'json')
-            product_yaml = get_concrete_product(factory, 'yaml')
-            product_config = get_concrete_product(factory, 'config')
-            assert isinstance(product_json, NestedJSON)
-            assert isinstance(product_yaml, NestedYAML)
-            assert isinstance(product_config, NestedCONFIG)
+            if format_ == 'json':
+                assert isinstance(product, NestedJSON)
+            elif format_ == 'yaml':
+                assert isinstance(product, NestedYAML)
+            else:
+                assert isinstance(product, NestedCONFIG)
         elif type_test == 'plain':
-            product_json = get_concrete_product(factory, 'json')
-            product_yaml = get_concrete_product(factory, 'yaml')
-            product_config = get_concrete_product(factory, 'config')
-            assert isinstance(product_json, PlainJSON)
-            assert isinstance(product_yaml, PlainYAML)
-            assert isinstance(product_config, PlainCONFIG)
+            if format_ == 'json':
+                assert isinstance(product, PlainJSON)
+            elif format_ == 'yaml':
+                assert isinstance(product, PlainYAML)
+            else:
+                assert isinstance(product, PlainCONFIG)
         else:
-            product_json = get_concrete_product(factory, 'json')
-            product_yaml = get_concrete_product(factory, 'yaml')
-            product_config = get_concrete_product(factory, 'config')
-            assert product_json is None
-            assert product_yaml is None
-            assert product_config is None
+            assert product is None
+
+    @pytest.mark.parametrize("type_test", ['nested', 'plain', 'not_if_this'])
+    def test_func_get_concrete_factory(self, type_test):
+        factory = get_concrete_factory(type_test)
+        if type_test == 'nested':
+            assert isinstance(factory, FactoryNested)
+        elif type_test == 'plain':
+            assert isinstance(factory, FactoryPlain)
+        else:
+            assert factory is None
