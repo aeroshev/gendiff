@@ -2,18 +2,24 @@
 Этот модуль содержит в себе юнит тесты для консольного скрипта gendiff
 """
 
-from gendiff.products.product_json import NestedJSON, PlainJSON
-from gendiff.products.product_yaml import NestedYAML, PlainYAML
-from gendiff.products.product_config import NestedCONFIG, PlainCONFIG
 from gendiff.generator_ast.components import Component, ComponentState
 from gendiff.parser import get_concrete_factory, get_concrete_product
+from gendiff.products.product_config import NestedCONFIG, PlainCONFIG
+from gendiff.products.product_json import NestedJSON, PlainJSON
+from gendiff.products.product_yaml import NestedYAML, PlainYAML
 
 
 class TestGendiff:
-    reference_ast = {Component('group3', ComponentState.INSERT, {'fee': '100500'}),
-                     Component('group2', ComponentState.DELETE, {'abc': '12345'}),
+    reference_ast = {Component('group3',
+                               ComponentState.INSERT,
+                               {'fee': '100500'}),
+                     Component('group2',
+                               ComponentState.DELETE,
+                               {'abc': '12345'}),
                      Component('group1', ComponentState.CHILDREN, {
-                         Component('baz', ComponentState.UPDATE, ('bas', 'bars')),
+                         Component('baz',
+                                   ComponentState.UPDATE,
+                                   ('bas', 'bars')),
                          Component('nest', ComponentState.UPDATE, (
                              {'key': 'value'},
                              'str'
@@ -25,7 +31,9 @@ class TestGendiff:
                              True,
                              {'key': 'value'}
                          )),
-                         Component('setting4', ComponentState.INSERT, 'blah blah'),
+                         Component('setting4',
+                                   ComponentState.INSERT,
+                                   'blah blah'),
                          Component('setting5', ComponentState.INSERT, {
                              'key5': 'value5'
                          }),

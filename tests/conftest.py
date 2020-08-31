@@ -1,12 +1,11 @@
-import pytest
-import os
 import json
+import os
+from typing import Optional, Tuple, Union
+
+import pytest
 import yaml
 
-from typing import Tuple, Optional, Union
-
-from gendiff.factories.factory import FactoryNested, FactoryPlain, AbstractFactory
-
+from gendiff.factories.factory import AbstractFactory, FactoryNested, FactoryPlain
 from gendiff.products.abstract_product import AbstractProduct
 from gendiff.products.product_json import NestedJSON, PlainJSON
 from gendiff.products.product_yaml import NestedYAML, PlainYAML
@@ -58,7 +57,8 @@ def setup_compare_test(request) -> Tuple[dict, dict, AbstractProduct]:
 
     product = get_product(request.param)
 
-    with open(path_file_before, 'r') as file_1, open(path_file_after, 'r') as file_2:
+    with open(path_file_before, 'r') as file_1, \
+            open(path_file_after, 'r') as file_2:
         data_1 = file_1.read()
         data_2 = file_2.read()
 

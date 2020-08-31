@@ -4,8 +4,7 @@
 """
 from typing import Optional, TextIO
 
-from gendiff.factories.factory import (AbstractFactory, FactoryNested,
-                                       FactoryPlain)
+from gendiff.factories.factory import AbstractFactory, FactoryNested, FactoryPlain
 from gendiff.products.abstract_product import AbstractProduct
 
 
