@@ -2,7 +2,7 @@
 Этот модуль содержит функции которые занимаются обработкой входных параметров и
 выбором продукта для обработки файлов
 """
-from typing import Optional, TextIO
+from typing import Optional, TextIO, Union
 
 from gendiff.factories.factory import (AbstractFactory, FactoryNested,
                                        FactoryPlain)
@@ -12,7 +12,7 @@ from gendiff.products.product_yaml import AbstractYAML
 
 
 def get_concrete_product(factory: AbstractFactory,
-                         file_type: str) -> Optional[AbstractJSON, AbstractYAML, AbstractCONFIG]:
+                         file_type: str) -> Union[AbstractJSON, AbstractYAML, AbstractCONFIG]:
     """
     За счёт полученного расширения файла определяет какой конкретный продукт
     необходимо получить

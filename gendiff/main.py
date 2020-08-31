@@ -1,7 +1,7 @@
 """
 Этот модуль является точкой входа в консольный скрипт gendiff
 """
-from typing import TextIO
+from typing import TextIO, Any, Union, Optional, Sequence
 
 import click
 import pkg_resources
@@ -11,10 +11,13 @@ from gendiff.parser import parse
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 
-def print_version(ctx, value) -> None:
+def print_version(ctx: click.Context,
+                  param: Union[click.Option, click.Parameter],
+                  value:  Sequence[Union[int, bool, str]]) -> Any:
     """
     Узнаёт версию программы просматривая файл setup.py
     :param ctx:
+    :param param:
     :param value:
     :return: nothing
     """
