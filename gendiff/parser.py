@@ -76,10 +76,10 @@ def parse(first_config: TextIO, second_config: TextIO, format_: str) -> str:
         second_data = read_file(second_config)
 
         if product:
-            desirealize_1 = product.read(first_data)
-            desirealize_2 = product.read(second_data)
+            deserialized_1 = product.read(first_data)
+            deserialized_2 = product.read(second_data)
 
-            diff = product.compare(desirealize_1, desirealize_2)
+            diff = product.compare(deserialized_1, deserialized_2)
             try:
                 product.render(diff)
             except TypeError:
