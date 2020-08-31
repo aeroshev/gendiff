@@ -1,7 +1,7 @@
 """
 Этот модуль является точкой входа в консольный скрипт gendiff
 """
-from typing import TextIO, Any, Union, Optional, Sequence
+from typing import Any, Sequence, TextIO, Union
 
 import click
 import pkg_resources
@@ -29,9 +29,12 @@ def print_version(ctx: click.Context,
 
 
 @click.command(context_settings=CONTEXT_SETTINGS)
-@click.option('-v', '--version', required=False, is_flag=True, callback=print_version,
-              expose_value=False, is_eager=True, help='output the version program')
-@click.option('-f', '--format', required=False, default='nested', help='output format')
+@click.option('-v', '--version', required=False, is_flag=True,
+              callback=print_version,
+              expose_value=False, is_eager=True,
+              help='output the version program')
+@click.option('-f', '--format', required=False,
+              default='nested', help='output format')
 @click.argument('first_config', type=click.File('r'))
 @click.argument('second_config', type=click.File('r'))
 def cli(format: str, first_config: TextIO, second_config: TextIO):

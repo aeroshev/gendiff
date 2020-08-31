@@ -9,7 +9,7 @@ def read(file_name: str):
 setup(
     name='gendiff',
     version='1.0.0',
-    python_requires='>3.8.0',
+    python_requires='>=3.8.0',
     packages=find_packages(),
     include_package_data=True,
     install_requires=[

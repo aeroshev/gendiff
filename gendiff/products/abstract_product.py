@@ -10,6 +10,7 @@ class AbstractProduct(ABC):
         :return:
         """
 
+    @abstractmethod
     def compare(self, input_1: dict, input_2: dict) -> set:
         """
         :param input_1:
@@ -17,6 +18,7 @@ class AbstractProduct(ABC):
         :return:
         """
 
+    @abstractmethod
     def render(self, result: set) -> None:
         """
         :param result:

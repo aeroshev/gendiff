@@ -29,7 +29,9 @@ class Component:
 
     __slots__ = ('param', 'state', 'value')
 
-    def __init__(self, param='default', state=ComponentState.DEFAULT, value='default'):
+    def __init__(self, param='default',
+                 state=ComponentState.DEFAULT,
+                 value='default'):
         self.param: str = param
         self.state: ComponentState = state
         self.value: Union[str, dict, set, tuple] = value
@@ -41,10 +43,9 @@ class Component:
         return f'{self.param}, {self.state}, {self.value}'
 
     def __eq__(self, other):
-        status = False
-        if self.param == other.param and self.state == other.state and self.value == other.value:
-            status = True
-        return status
+        return True if self.param == other.param \
+                       and self.state == other.state \
+                       and self.value == other.value else False
 
     def __hash__(self):
         return hash(self.param) + hash(self.state)

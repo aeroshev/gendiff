@@ -2,17 +2,15 @@
 Этот модуль содержит функции которые занимаются обработкой входных параметров и
 выбором продукта для обработки файлов
 """
-from typing import Optional, TextIO, Union
+from typing import Optional, TextIO
 
 from gendiff.factories.factory import (AbstractFactory, FactoryNested,
                                        FactoryPlain)
-from gendiff.products.product_config import AbstractCONFIG
-from gendiff.products.product_json import AbstractJSON
-from gendiff.products.product_yaml import AbstractYAML
+from gendiff.products.abstract_product import AbstractProduct
 
 
 def get_concrete_product(factory: AbstractFactory,
-                         file_type: str) -> Union[AbstractJSON, AbstractYAML, AbstractCONFIG]:
+                         file_type: str) -> Optional[AbstractProduct]:
     """
     За счёт полученного расширения файла определяет какой конкретный продукт
     необходимо получить
@@ -21,12 +19,13 @@ def get_concrete_product(factory: AbstractFactory,
     :return: product (*JSON, *YAML, *CONFIG)
     """
     product = None
-    if file_type == 'json':
-        product = factory.create_json()
-    elif file_type == 'yaml':
-        product = factory.create_yaml()
-    elif file_type == 'config':
-        product = factory.create_config()
+    if factory:
+        if file_type == 'json':
+            product = factory.create_json()
+        elif file_type == 'yaml':
+            product = factory.create_yaml()
+        elif file_type == 'config':
+            product = factory.create_config()
     return product
 
 
@@ -76,14 +75,17 @@ def parse(first_config: TextIO, second_config: TextIO, format_: str) -> str:
         first_data = read_file(first_config)
         second_data = read_file(second_config)
 
-        desirealize_1 = product.read(first_data)
-        desirealize_2 = product.read(second_data)
+        if product:
+            desirealize_1 = product.read(first_data)
+            desirealize_2 = product.read(second_data)
 
-        diff = product.compare(desirealize_1, desirealize_2)
-        try:
-            product.render(diff)
-        except TypeError:
-            status = 'Render was stopped with error'
+            diff = product.compare(desirealize_1, desirealize_2)
+            try:
+                product.render(diff)
+            except TypeError:
+                status = 'Render was stopped with error'
+        else:
+            status = 'Internal error'
     else:
         status = 'Not equal format file'
     return status
