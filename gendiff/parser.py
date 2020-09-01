@@ -2,7 +2,8 @@
 Этот модуль содержит функции которые занимаются обработкой входных параметров и
 выбором продукта для обработки файлов
 """
-from typing import Optional, TextIO
+from io import TextIOWrapper
+from typing import Optional
 
 from gendiff.factories.factory import (AbstractFactory,
                                        FactoryNested, FactoryPlain)
@@ -43,17 +44,20 @@ def get_concrete_factory(format_: str) -> Optional[AbstractFactory]:
     return factory
 
 
-def read_file(file_name: TextIO) -> str:
+def read_file(file_name: TextIOWrapper) -> str:
     """
     Чтение файла.
     Контекстный оператор не используется, т.к. click сам открывает файл
     :param file_name:
     :return: data from file
     """
-    return file_name.read()
+    if isinstance(file_name, TextIOWrapper):
+        return file_name.read()
+    else:
+        raise TypeError
 
 
-def parse(first_config: TextIO, second_config: TextIO, format_: str) -> str:
+def parse(first_config: TextIOWrapper, second_config: TextIOWrapper, format_: str) -> str:
     """
     Происходит основная частьсв работы.
     Содержит в себе вызовы функций чтения из файла, десериализации, сравнения

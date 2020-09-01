@@ -5,7 +5,8 @@ import pytest
 
 from gendiff.factories.factory import FactoryNested, FactoryPlain
 from gendiff.generator_ast.components import Component, ComponentState
-from gendiff.parser import get_concrete_factory, get_concrete_product
+from gendiff.parser import (get_concrete_factory,
+                            get_concrete_product, read_file, parse)
 from gendiff.products.product_config import NestedCONFIG, PlainCONFIG
 from gendiff.products.product_json import NestedJSON, PlainJSON
 from gendiff.products.product_yaml import NestedYAML, PlainYAML
@@ -123,3 +124,29 @@ class TestGendiff:
                 product = PlainYAML()
                 with pytest.raises(TypeError):
                     product.render(invalid_ast)
+
+    def test_read_file(self, setup_read_file_test):
+        invalid_file = setup_read_file_test
+        with pytest.raises(TypeError):
+            read_file(invalid_file)
+
+    def test_components(self):
+        component_1 = Component('param', ComponentState.INSERT, 45)
+        component_2 = Component('second param', ComponentState.DELETE, 'deleted')
+
+        assert str(component_1) == 'param, ComponentState.INSERT, 45'
+        assert str(component_2) == 'second param, ComponentState.DELETE, deleted'
+
+        assert component_1 == component_1
+        assert component_1 != component_2
+
+    @pytest.mark.parametrize("format_", ['nested', 'plain', 'bad'])
+    def test_parse(self, format_, setup_parse_func):
+        io_1, io_2, param = setup_parse_func
+        if param == 'normal':
+            if format_ != 'bad':
+                assert parse(io_1, io_2, format_) == 'Good'
+            else:
+                assert parse(io_1, io_2, format_) == 'Internal error'
+        else:
+            assert parse(io_1, io_2, format_) == 'Not equal format file'

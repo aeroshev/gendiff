@@ -41,5 +41,10 @@ def cli(format: str, first_config: TextIO, second_config: TextIO):
     """
     Compares two configuration files and shows a difference.
     """
-    res = parse(first_config, second_config, format)
+    res = 'Error parse'
+    try:
+        res = parse(first_config, second_config, format)
+    except TypeError:
+        pass
+
     click.echo(res)

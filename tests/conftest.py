@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Optional, Tuple, Union, Set
+from typing import Optional, Tuple, Union, Set, Generator
 
 import pytest
 import yaml
@@ -145,3 +145,39 @@ def setup_render_test(request) -> Set[Component]:
         return invalid_set_ast
     else:
         return invalid_state_ast
+
+
+@pytest.fixture(scope="function", params=[
+    'string',
+    'number',
+    'structure'
+])
+def setup_read_file_test(request):
+    if request.param == 'string':
+        return 'not_a_file'
+    elif request.param == 'number':
+        return 42
+    else:
+        return {'Hello': 'World!'}
+
+
+@pytest.fixture(scope="function", params=[
+    'normal',
+    'not equal format',
+])
+def setup_parse_func(request) -> Generator:
+    project_dir = os.path.dirname(os.path.dirname(__file__))
+    files_dir = os.path.join(project_dir, "test_files/")
+
+    path_file_before = os.path.join(files_dir, "before.json")
+    path_file_after = os.path.join(files_dir, "after.json")
+    path_file_after_yaml = os.path.join(files_dir, "after.yaml")
+
+    if request.param == 'normal':
+        with open(path_file_before, 'r') as file_1, \
+                open(path_file_after, 'r') as file_2:
+            yield file_1, file_2, str(request.param)
+    else:
+        with open(path_file_before, 'r') as file_1, \
+                open(path_file_after_yaml, 'r') as file_2:
+            yield file_1, file_2, str(request.param)
