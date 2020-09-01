@@ -57,7 +57,9 @@ def read_file(file_name: TextIOWrapper) -> str:
         raise TypeError
 
 
-def parse(first_config: TextIOWrapper, second_config: TextIOWrapper, format_: str) -> str:
+def parse(first_config: TextIOWrapper,
+          second_config: TextIOWrapper,
+          format_: str) -> str:
     """
     Происходит основная частьсв работы.
     Содержит в себе вызовы функций чтения из файла, десериализации, сравнения
@@ -76,8 +78,12 @@ def parse(first_config: TextIOWrapper, second_config: TextIOWrapper, format_: st
         factory = get_concrete_factory(format_)
         product = get_concrete_product(factory, f_format_file)
 
-        first_data = read_file(first_config)
-        second_data = read_file(second_config)
+        try:
+            first_data = read_file(first_config)
+            second_data = read_file(second_config)
+        except TypeError:
+            status = 'Error parse'
+            return status
 
         if product:
             deserialized_1 = product.read(first_data)

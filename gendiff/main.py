@@ -42,10 +42,5 @@ def cli(format: str, first_config: TextIOWrapper, second_config: TextIOWrapper):
     """
     Compares two configuration files and shows a difference.
     """
-    res = 'Error parse'
-    try:
-        res = parse(first_config, second_config, format)
-    except TypeError:
-        pass
-
+    res = parse(first_config, second_config, format)
     click.echo(res)
