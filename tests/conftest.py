@@ -51,7 +51,7 @@ def get_product(type_: str) -> Optional[AbstractProduct]:
     'yaml'
 ])
 def setup_compare_test(request) -> Tuple[dict, dict, AbstractProduct]:
-    project_dir = os.path.dirname(os.path.dirname(__file__))
+    project_dir = os.path.dirname(__file__)
     files_dir = os.path.join(project_dir, "test_files/")
 
     path_file_before = os.path.join(files_dir, "before." + request.param)
@@ -165,7 +165,7 @@ def setup_read_file_test(request):
     'not equal format',
 ])
 def setup_parse_func(request) -> Generator:
-    project_dir = os.path.dirname(os.path.dirname(__file__))
+    project_dir = os.path.dirname(__file__)
     files_dir = os.path.join(project_dir, "test_files/")
 
     path_file_before = os.path.join(files_dir, "before.json")
