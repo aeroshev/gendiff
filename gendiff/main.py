@@ -40,7 +40,7 @@ def print_version(ctx: click.Context,
 @click.argument('second_config', type=click.File('r'))
 def cli(format: str,
         first_config: TextIOWrapper,
-        second_config: TextIOWrapper):
+        second_config: TextIOWrapper) -> None:
     """
     Compares two configuration files and shows a difference.
     """
