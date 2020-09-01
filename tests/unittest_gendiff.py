@@ -54,14 +54,14 @@ class TestGendiff:
         product, type_test = setup_decompot
         if type_test == 'json':
             assert '{\n Hello, world: Hello, Python\n}' \
-                   == product.decompot({'Hello, world': 'Hello, Python'})
+                   == product.decomposition({'Hello, world': 'Hello, Python'})
         elif type_test == 'yaml':
             assert '\n    Hello, world: Hello, Python' \
-                   == product.decompot({'Hello, world': 'Hello, Python'})
-        assert str(52) == product.decompot(52)
-        assert str('Hello') == product.decompot('Hello')
-        assert str(45, ) == product.decompot(45, )
-        assert str({'set'}) == product.decompot({'set'})
+                   == product.decomposition({'Hello, world': 'Hello, Python'})
+        assert str(52) == product.decomposition(52)
+        assert str('Hello') == product.decomposition('Hello')
+        assert str(45, ) == product.decomposition(45, )
+        assert str({'set'}) == product.decomposition({'set'})
 
     def test_is_complex(self, setup_is_complex):
         product = setup_is_complex

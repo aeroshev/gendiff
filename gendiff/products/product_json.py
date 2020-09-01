@@ -102,7 +102,7 @@ class NestedJSON(AbstractJSON):
         self.deep: int = 0
         init()
 
-    def decompot(self, object_: Any) -> str:
+    def decomposition(self, object_: Any) -> str:
         """
         Декомпозиция value из Component словаря
         для pretty print
@@ -122,19 +122,19 @@ class NestedJSON(AbstractJSON):
             if item.state == ComponentState.INSERT:
                 print(self.deep * ' ' +
                       f'{Fore.GREEN}+ {item.param}: '
-                      f'{self.decompot(item.value)}')
+                      f'{self.decomposition(item.value)}')
             elif item.state == ComponentState.DELETE:
                 print(self.deep * ' ' +
                       f'{Fore.RED}- {item.param}: '
-                      f'{self.decompot(item.value)}')
+                      f'{self.decomposition(item.value)}')
             elif item.state == ComponentState.UPDATE:
                 if isinstance(item.value, tuple):
                     print(self.deep * ' ' +
                           f'{Fore.RED}- {item.param}: '
-                          f'{self.decompot(item.value[0])}')
+                          f'{self.decomposition(item.value[0])}')
                     print(self.deep * ' ' +
                           f'{Fore.GREEN}+ {item.param}: '
-                          f'{self.decompot(item.value[1])}')
+                          f'{self.decomposition(item.value[1])}')
                 else:
                     raise TypeError
             elif item.state == ComponentState.CHILDREN:
