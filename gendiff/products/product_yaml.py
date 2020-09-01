@@ -6,7 +6,7 @@
 в абстрактном классе
 """
 from abc import abstractmethod
-from typing import Any, Dict, Iterator, List, Set
+from typing import Any, Dict, List, Set
 
 import yaml
 from colorama import Fore, init
@@ -22,10 +22,6 @@ class AbstractYAML(AbstractProduct):
     асбтрактные методы, которые необходимо переопределить
     для различных продуктов
     """
-
-    def __init__(self):
-        self.ast: Set[Component] = set()
-
     def read(self, data: str) -> Dict[str, Any]:
         """
         Десериализация строковых данных в python формат
@@ -33,76 +29,6 @@ class AbstractYAML(AbstractProduct):
         :return: словарик словариков
         """
         return yaml.load(data, yaml.Loader)
-
-    def compare(self,
-                input_1_yaml: Dict[str, Any],
-                input_2_yaml: Dict[str, Any]) -> Set[Component]:
-        """
-        Главная функция построения AST различий файлов
-        Имеет рекусривный вызов для вложенных структур
-        :param input_1_yaml: десериализованые данные из первого файла
-        :param input_2_yaml: десериализованые данные из второго файла
-        :return: множество Component
-        """
-        iter_1: Iterator = iter(input_1_yaml)
-        iter_2: Iterator = iter(input_2_yaml)
-
-        key_1: str = ''
-        key_2: str = ''
-
-        while True:
-            broke = 0
-            try:
-                key_1 = next(iter_1)
-            except StopIteration:
-                broke += 1
-            try:
-                key_2 = next(iter_2)
-            except StopIteration:
-                broke += 1
-            if broke == 2:
-                break
-            # 2 - None, 4 - object <-> insert item 2
-            # 2 - object, 4 - object <-> update item 2
-
-            # 1 - None, 3 - object <-> delete item 1
-            # 1 - object, 3 - object <-> update item 1
-
-            old_in_new = input_2_yaml.get(key_1)  # 1
-            new_in_old = input_1_yaml.get(key_2)  # 2
-            old_in_old = input_1_yaml.get(key_1)  # 3
-            # new_in_new = input_2_json.get(key_2)  # 4
-
-            if new_in_old is None:
-                self.ast.add(Component(key_2,
-                                       ComponentState.INSERT,
-                                       input_2_yaml[key_2]))
-            if old_in_new is None:
-                self.ast.add(Component(key_1,
-                                       ComponentState.DELETE,
-                                       input_1_yaml[key_1]))
-            if not (old_in_new is None) \
-                    and not (old_in_old is None) \
-                    and old_in_new != old_in_old:
-                if isinstance(old_in_old, dict) \
-                        and isinstance(old_in_new, dict):
-                    store = self.ast
-                    self.ast = set()
-                    new_ = self.compare(old_in_old, old_in_new)
-                    self.ast = store
-                    object_ = Component(key_1,
-                                        ComponentState.CHILDREN,
-                                        new_)
-                    if object_ not in self.ast:
-                        self.ast.add(object_)
-                else:
-                    object_ = Component(key_1,
-                                        ComponentState.UPDATE,
-                                        (old_in_old, old_in_new))
-                    if object_ not in self.ast:
-                        self.ast.add(object_)
-
-        return self.ast
 
     @abstractmethod
     def render(self, result: Set[Component]) -> None:

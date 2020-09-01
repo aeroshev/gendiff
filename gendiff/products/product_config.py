@@ -21,6 +21,7 @@ class AbstractCONFIG(AbstractProduct):
     для различных продуктов
     """
     def __init__(self):
+        super().__init__()
         self.parser = configparser.ConfigParser()
 
     def read(self, data: str) -> Dict[str, Any]:
@@ -32,17 +33,6 @@ class AbstractCONFIG(AbstractProduct):
         parser = configparser.ConfigParser()
         parser.read(data)
         return {'Hello': 'world'}
-
-    def compare(self,
-                input_1_ini: Dict[str, Any],
-                input_2_ini: Dict[str, Any]) -> Set[Component]:
-        """
-        Главная функция построения AST различий файлов
-        Имеет рекусривный вызов для вложенных структур
-        :param input_1_ini: десериализованые данные из первого файла
-        :param input_2_ini: десериализованые данные из второго файла
-        :return: множество Component
-        """
 
     @abstractmethod
     def render(self, result: Set[Component]) -> None:
