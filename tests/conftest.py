@@ -1,17 +1,16 @@
 import json
 import os
-from typing import Optional, Tuple, Union, Set, Generator
+from typing import Generator, Optional, Set, Tuple, Union
 
 import pytest
 import yaml
 
 from gendiff.factories.factory import (AbstractFactory,
                                        FactoryNested, FactoryPlain)
+from gendiff.generator_ast.components import Component, ComponentState
 from gendiff.products.abstract_product import AbstractProduct
 from gendiff.products.product_json import NestedJSON, PlainJSON
 from gendiff.products.product_yaml import NestedYAML, PlainYAML
-
-from gendiff.generator_ast.components import Component, ComponentState
 
 
 def deserialization(data: str, type_: str):
