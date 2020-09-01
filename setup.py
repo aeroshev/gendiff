@@ -35,5 +35,3 @@ setup(
     description="This program compare two files and show changes",
     long_description=read("README.md")
 )
-
-

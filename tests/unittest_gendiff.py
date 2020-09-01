@@ -54,7 +54,7 @@ class TestGendiff:
         if type_test == 'json':
             assert '{\n Hello, world: Hello, Python\n}' \
                    == product.decompot({'Hello, world': 'Hello, Python'})
-        else:
+        elif type_test == 'yaml':
             assert '\n    Hello, world: Hello, Python' \
                    == product.decompot({'Hello, world': 'Hello, Python'})
         assert str(52) == product.decompot(52)
@@ -101,5 +101,25 @@ class TestGendiff:
         else:
             assert factory is None
 
-    # def test_raise_in_render(self, setup_render_test):
-    #     pass
+    @pytest.mark.parametrize("type_test", ['nested', 'plain'])
+    @pytest.mark.parametrize("format_", ['json', 'yaml'])
+    def test_raise_in_render(self, type_test, format_, setup_render_test):
+        invalid_ast = setup_render_test
+        if type_test == 'nested':
+            if format_ == 'json':
+                product = NestedJSON()
+                with pytest.raises(TypeError):
+                    product.render(invalid_ast)
+            elif format_ == 'yaml':
+                product = NestedYAML()
+                with pytest.raises(TypeError):
+                    product.render(invalid_ast)
+        elif type_test == 'plain':
+            if format_ == 'json':
+                product = PlainJSON()
+                with pytest.raises(TypeError):
+                    product.render(invalid_ast)
+            elif format_ == 'yaml':
+                product = PlainYAML()
+                with pytest.raises(TypeError):
+                    product.render(invalid_ast)

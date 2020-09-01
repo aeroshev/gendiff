@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, Set
 
 import pytest
 import yaml
@@ -11,7 +11,7 @@ from gendiff.products.abstract_product import AbstractProduct
 from gendiff.products.product_json import NestedJSON, PlainJSON
 from gendiff.products.product_yaml import NestedYAML, PlainYAML
 
-# from gendiff.generator_ast.components import Component
+from gendiff.generator_ast.components import Component, ComponentState
 
 
 def deserialization(data: str, type_: str):
@@ -105,7 +105,43 @@ def setup_is_complex(request) -> Union[PlainJSON, PlainYAML]:
     else:
         return PlainYAML()
 
-#
-# @pytest.fixture(scope="function")
-# def setup_render_test(request) -> Set[Component]:
-#     invalid_ast: Set[Component] = {}
+
+@pytest.fixture(scope="function", params=[
+    'try invalid tuple',
+    'try invalid set',
+    'try invalid state'
+])
+def setup_render_test(request) -> Set[Component]:
+    invalid_tuple_ast: Set[Component] = {Component('insert',
+                                                   ComponentState.INSERT,
+                                                   'new_value'),
+                                         Component('invalid_update',
+                                                   ComponentState.UPDATE,
+                                                   'not_a_tuple'),
+                                         Component('delete',
+                                                   ComponentState.DELETE,
+                                                   45)}
+    invalid_set_ast: Set[Component] = {Component('insert',
+                                                 ComponentState.INSERT,
+                                                 'new_value'),
+                                       Component('invalid children',
+                                                 ComponentState.CHILDREN,
+                                                 'not_a_set'),
+                                       Component('delete',
+                                                 ComponentState.DELETE,
+                                                 45)}
+    invalid_state_ast: Set[Component] = {Component('insert',
+                                                   ComponentState.INSERT,
+                                                   'new_value'),
+                                         Component('invalid_state',
+                                                   -1,
+                                                   'invalid_state'),
+                                         Component('delete',
+                                                   ComponentState.DELETE,
+                                                   45)}
+    if request.param == 'try invalid tuple':
+        return invalid_tuple_ast
+    elif request.param == 'try invalid set':
+        return invalid_set_ast
+    else:
+        return invalid_state_ast
