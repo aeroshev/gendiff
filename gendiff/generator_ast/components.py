@@ -2,16 +2,15 @@
 Содержит в себе класс Component необходимый для построения AST дерева
 """
 from enum import Enum, unique
-from typing import Union
+from typing import Set, Union
 
 
 @unique
 class ComponentState(Enum):
-    DEFAULT = 1
-    INSERT = 2
-    DELETE = 3
-    UPDATE = 4
-    CHILDREN = 5
+    INSERT = 1
+    DELETE = 2
+    UPDATE = 3
+    CHILDREN = 4
 
 
 class Component:
@@ -29,12 +28,15 @@ class Component:
 
     __slots__ = ('param', 'state', 'value')
 
-    def __init__(self, param='default',
-                 state=ComponentState.DEFAULT,
-                 value='default'):
+    def __init__(self, param, state, value):
         self.param: str = param
         self.state: ComponentState = state
-        self.value: Union[str, dict, set, tuple] = value
+        self.value: Union[Set[Component],
+                          bool,
+                          int,
+                          float,
+                          tuple,
+                          str] = value
 
     def __str__(self):
         return f'{self.param}, {self.state}, {self.value}'

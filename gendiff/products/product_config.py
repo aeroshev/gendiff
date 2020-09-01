@@ -7,8 +7,10 @@
 """
 import configparser
 from abc import abstractmethod
+from typing import Any, Dict, Set
 
 from gendiff.products.abstract_product import AbstractProduct
+from gendiff.generator_ast.components import Component
 
 
 class AbstractCONFIG(AbstractProduct):
@@ -21,7 +23,7 @@ class AbstractCONFIG(AbstractProduct):
     def __init__(self):
         self.parser = configparser.ConfigParser()
 
-    def read(self, data: str):
+    def read(self, data: str) -> Dict[str, Any]:
         """
         Десериализация строковых данных в python формат
         :param data: данные из файла
@@ -29,8 +31,11 @@ class AbstractCONFIG(AbstractProduct):
         """
         parser = configparser.ConfigParser()
         parser.read(data)
+        return {'Hello': 'world'}
 
-    def compare(self, input_1_ini: dict, input_2_ini: dict):
+    def compare(self,
+                input_1_ini: Dict[str, Any],
+                input_2_ini: Dict[str, Any]) -> Set[Component]:
         """
         Главная функция построения AST различий файлов
         Имеет рекусривный вызов для вложенных структур
@@ -40,7 +45,7 @@ class AbstractCONFIG(AbstractProduct):
         """
 
     @abstractmethod
-    def render(self, result: set):
+    def render(self, result: Set[Component]) -> None:
         """
         Вывод различий в терминал пользавателю
         В каждом классе определяется свой стиль
@@ -53,7 +58,7 @@ class PlainCONFIG(AbstractCONFIG):
     """
     Класс переопределяющий метод render для плоского вывода результат
     """
-    def render(self, result: set):
+    def render(self, result: Set[Component]) -> None:
         pass
 
 
@@ -61,5 +66,5 @@ class NestedCONFIG(AbstractCONFIG):
     """
     Класс переопределяющий метод render для вложенного вывода результат
     """
-    def render(self, result: set):
+    def render(self, result: Set[Component]) -> None:
         pass

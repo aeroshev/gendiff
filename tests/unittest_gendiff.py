@@ -3,12 +3,12 @@
 """
 import pytest
 
+from gendiff.factories.factory import FactoryNested, FactoryPlain
 from gendiff.generator_ast.components import Component, ComponentState
 from gendiff.parser import get_concrete_factory, get_concrete_product
 from gendiff.products.product_config import NestedCONFIG, PlainCONFIG
 from gendiff.products.product_json import NestedJSON, PlainJSON
 from gendiff.products.product_yaml import NestedYAML, PlainYAML
-from gendiff.factories.factory import FactoryNested, FactoryPlain
 
 
 class TestGendiff:
@@ -101,6 +101,5 @@ class TestGendiff:
         else:
             assert factory is None
 
-    def test_raise_in_render(self, setup_render_test):
-        diff = setup_render_test
-
+    # def test_raise_in_render(self, setup_render_test):
+    #     pass

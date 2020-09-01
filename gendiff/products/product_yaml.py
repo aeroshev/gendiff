@@ -6,7 +6,7 @@
 в абстрактном классе
 """
 from abc import abstractmethod
-from typing import Any, List, Union
+from typing import Any, Dict, Iterator, List, Set
 
 import yaml
 from colorama import Fore, init
@@ -22,10 +22,11 @@ class AbstractYAML(AbstractProduct):
     асбтрактные методы, которые необходимо переопределить
     для различных продуктов
     """
-    def __init__(self):
-        self.ast = set()
 
-    def read(self, data: str) -> dict:
+    def __init__(self):
+        self.ast: Set[Component] = set()
+
+    def read(self, data: str) -> Dict[str, Any]:
         """
         Десериализация строковых данных в python формат
         :param data: данные из файла
@@ -33,7 +34,9 @@ class AbstractYAML(AbstractProduct):
         """
         return yaml.load(data, yaml.Loader)
 
-    def compare(self, input_1_yaml: dict, input_2_yaml: dict) -> set:
+    def compare(self,
+                input_1_yaml: Dict[str, Any],
+                input_2_yaml: Dict[str, Any]) -> Set[Component]:
         """
         Главная функция построения AST различий файлов
         Имеет рекусривный вызов для вложенных структур
@@ -41,17 +44,20 @@ class AbstractYAML(AbstractProduct):
         :param input_2_yaml: десериализованые данные из второго файла
         :return: множество Component
         """
-        iter_1 = iter(input_1_yaml)
-        iter_2 = iter(input_2_yaml)
+        iter_1: Iterator = iter(input_1_yaml)
+        iter_2: Iterator = iter(input_2_yaml)
+
+        key_1: str = ''
+        key_2: str = ''
 
         while True:
             broke = 0
             try:
-                item_1 = next(iter_1)
+                key_1 = next(iter_1)
             except StopIteration:
                 broke += 1
             try:
-                item_2 = next(iter_2)
+                key_2 = next(iter_2)
             except StopIteration:
                 broke += 1
             if broke == 2:
@@ -62,19 +68,19 @@ class AbstractYAML(AbstractProduct):
             # 1 - None, 3 - object <-> delete item 1
             # 1 - object, 3 - object <-> update item 1
 
-            old_in_new = input_2_yaml.get(item_1)  # 1
-            new_in_old = input_1_yaml.get(item_2)  # 2
-            old_in_old = input_1_yaml.get(item_1)  # 3
-            # new_in_new = input_2_json.get(item_2)  # 4
+            old_in_new = input_2_yaml.get(key_1)  # 1
+            new_in_old = input_1_yaml.get(key_2)  # 2
+            old_in_old = input_1_yaml.get(key_1)  # 3
+            # new_in_new = input_2_json.get(key_2)  # 4
 
             if new_in_old is None:
-                self.ast.add(Component(item_2,
+                self.ast.add(Component(key_2,
                                        ComponentState.INSERT,
-                                       input_2_yaml[item_2]))
+                                       input_2_yaml[key_2]))
             if old_in_new is None:
-                self.ast.add(Component(item_1,
+                self.ast.add(Component(key_1,
                                        ComponentState.DELETE,
-                                       input_1_yaml[item_1]))
+                                       input_1_yaml[key_1]))
             if not (old_in_new is None) \
                     and not (old_in_old is None) \
                     and old_in_new != old_in_old:
@@ -84,13 +90,13 @@ class AbstractYAML(AbstractProduct):
                     self.ast = set()
                     new_ = self.compare(old_in_old, old_in_new)
                     self.ast = store
-                    object_ = Component(item_1,
+                    object_ = Component(key_1,
                                         ComponentState.CHILDREN,
                                         new_)
                     if object_ not in self.ast:
                         self.ast.add(object_)
                 else:
-                    object_ = Component(item_1,
+                    object_ = Component(key_1,
                                         ComponentState.UPDATE,
                                         (old_in_old, old_in_new))
                     if object_ not in self.ast:
@@ -99,7 +105,7 @@ class AbstractYAML(AbstractProduct):
         return self.ast
 
     @abstractmethod
-    def render(self, result):
+    def render(self, result: Set[Component]) -> None:
         """
         Вывод различий в терминал пользавателю
         В каждом классе определяется свой стиль
@@ -123,7 +129,7 @@ class PlainYAML(AbstractYAML):
     def is_complex(value: Any) -> str:
         return '[complex value]' if isinstance(value, dict) else str(value)
 
-    def render(self, result: Union[set, dict]) -> None:
+    def render(self, result: Set[Component]) -> None:
         for item in result:
             self.path.append(item.param)
             if item.state == ComponentState.INSERT:
@@ -137,16 +143,23 @@ class PlainYAML(AbstractYAML):
                       f'{Fore.RED}\'{".".join(self.path)}\''
                       f'{Fore.WHITE} was removed')
             elif item.state == ComponentState.UPDATE:
-                print(f'{Fore.WHITE}Property '
-                      f'{Fore.YELLOW}\'{".".join(self.path)}\'{Fore.WHITE} '
-                      f'was updated. From '
-                      f'{Fore.RED}'
-                      f'{self.is_complex(item.value[0])} '
-                      f'{Fore.WHITE}to '
-                      f'{Fore.GREEN}'
-                      f'{self.is_complex(item.value[1])}')
+                if isinstance(item.value, tuple):
+                    print(f'{Fore.WHITE}Property '
+                          f'{Fore.YELLOW}\'{".".join(self.path)}\''
+                          f'{Fore.WHITE} '
+                          f'was updated. From '
+                          f'{Fore.RED}'
+                          f'{self.is_complex(item.value[0])} '
+                          f'{Fore.WHITE}to '
+                          f'{Fore.GREEN}'
+                          f'{self.is_complex(item.value[1])}')
+                else:
+                    raise TypeError
             elif item.state == ComponentState.CHILDREN:
-                self.render(item.value)
+                if isinstance(item.value, set):
+                    self.render(item.value)
+                else:
+                    raise TypeError
             else:
                 raise TypeError
             self.path.pop(-1)
@@ -173,35 +186,41 @@ class NestedYAML(AbstractYAML):
         """
         if isinstance(object_, dict):
             key, contain = [*object_.items()][0]
-            value = '\n' + (self.deep + 4)*' ' + \
+            value = '\n' + (self.deep + 4) * ' ' + \
                     f'{key}: {contain}'
         else:
             value = str(object_)
         return value
 
-    def render(self, result: Union[set, dict]) -> None:
+    def render(self, result: Set[Component]) -> None:
         for item in result:
             if item.state == ComponentState.INSERT:
-                print(self.deep*' ' +
+                print(self.deep * ' ' +
                       f'{Fore.GREEN}+ {item.param}: '
                       f'{self.decompot(item.value)}')
             elif item.state == ComponentState.DELETE:
-                print(self.deep*' ' +
+                print(self.deep * ' ' +
                       f'{Fore.RED}- {item.param}: '
                       f'{self.decompot(item.value)}')
             elif item.state == ComponentState.UPDATE:
-                print(self.deep*' ' +
-                      f'{Fore.RED}- {item.param}: '
-                      f'{self.decompot(item.value[0])}')
-                print(self.deep*' ' +
-                      f'{Fore.GREEN}+ {item.param}: '
-                      f'{self.decompot(item.value[1])}')
+                if isinstance(item.value, tuple):
+                    print(self.deep * ' ' +
+                          f'{Fore.RED}- {item.param}: '
+                          f'{self.decompot(item.value[0])}')
+                    print(self.deep * ' ' +
+                          f'{Fore.GREEN}+ {item.param}: '
+                          f'{self.decompot(item.value[1])}')
+                else:
+                    raise TypeError
             elif item.state == ComponentState.CHILDREN:
-                print(Fore.WHITE + self.deep*' ' + f'{item.param}:')
+                if isinstance(item.value, set):
+                    print(Fore.WHITE + self.deep * ' ' + f'{item.param}:')
 
-                self.deep += 2
-                self.render(item.value)
-                self.deep -= 2
+                    self.deep += 2
+                    self.render(item.value)
+                    self.deep -= 2
+                else:
+                    raise TypeError
             else:
                 raise TypeError
         print(f'{Fore.WHITE}', end='')

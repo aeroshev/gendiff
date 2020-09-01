@@ -5,9 +5,10 @@ PlainFactory - печать результата в плоском стиле
 """
 from abc import ABC, abstractmethod
 
-from gendiff.products.product_config import NestedCONFIG, PlainCONFIG
-from gendiff.products.product_json import NestedJSON, PlainJSON
-from gendiff.products.product_yaml import NestedYAML, PlainYAML
+from gendiff.products.product_config import (AbstractCONFIG, NestedCONFIG,
+                                             PlainCONFIG)
+from gendiff.products.product_json import AbstractJSON, NestedJSON, PlainJSON
+from gendiff.products.product_yaml import AbstractYAML, NestedYAML, PlainYAML
 
 
 class AbstractFactory(ABC):
@@ -16,21 +17,21 @@ class AbstractFactory(ABC):
     для всех фабрик
     """
     @abstractmethod
-    def create_json(self):
+    def create_json(self) -> AbstractJSON:
         """
         Возращает продукт для обработки JSON файлов
         :return:
         """
 
     @abstractmethod
-    def create_yaml(self):
+    def create_yaml(self) -> AbstractYAML:
         """
         Возращает продукт для обработки YAML файлов
         :return:
         """
 
     @abstractmethod
-    def create_config(self):
+    def create_config(self) -> AbstractCONFIG:
         """
         Возращает продукт для обработки INI файлов
         :return:
