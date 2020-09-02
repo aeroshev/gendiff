@@ -156,18 +156,23 @@ class TestGendiff:
                 assert isinstance(product, PlainYAML)
             else:
                 assert isinstance(product, PlainCONFIG)
-        else:
-            assert product is None
 
-    @pytest.mark.parametrize("type_test", ['nested', 'plain', 'not_if_this'])
+    @pytest.mark.parametrize("format_", ['json', 'yaml', 'ini'])
+    def test_func_get_concrete_product_exception(self, format_: str) -> None:
+        with pytest.raises(SystemError):
+            get_concrete_product(None, format_)
+
+    @pytest.mark.parametrize("type_test", ['nested', 'plain'])
     def test_func_get_concrete_factory(self, type_test) -> None:
         factory = get_concrete_factory(type_test)
         if type_test == 'nested':
             assert isinstance(factory, FactoryNested)
         elif type_test == 'plain':
             assert isinstance(factory, FactoryPlain)
-        else:
-            assert factory is None
+
+    def test_func_get_concrete_factory_exception(self) -> None:
+        with pytest.raises(SystemError):
+            get_concrete_factory('wrong_format')
 
     @pytest.mark.parametrize("type_test", ['nested', 'plain'])
     @pytest.mark.parametrize("format_", ['json', 'yaml', 'ini'])
@@ -214,6 +219,11 @@ class TestGendiff:
             if format_ != 'bad':
                 assert parse(io_1, io_2, format_) == 'Good'
             else:
-                assert parse(io_1, io_2, format_) == 'Internal error'
+                assert parse(io_1, io_2, format_) == 'Invalid format report'
+        elif param == 'bad extension':
+            if format_ != 'bad':
+                assert parse(io_1, io_2, format_) == 'Not support file extension'
+            else:
+                assert parse(io_1, io_2, format_) == 'Invalid format report'
         else:
             assert parse(io_1, io_2, format_) == 'Not equal format file'

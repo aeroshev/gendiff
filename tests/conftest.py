@@ -52,7 +52,6 @@ def setup_compare_test(request) -> Generator:
 @pytest.fixture(scope="function", params=[
     'nested',
     'plain',
-    'not_of_this'
 ])
 def setup_get_product(request) -> Tuple[Optional[AbstractFactory], str]:
     if request.param == 'nested':
@@ -140,16 +139,21 @@ def setup_render_test(request) -> Set[Component]:
 @pytest.fixture(scope="function", params=[
     'normal',
     'not equal format',
+    'bad extension'
 ])
 def setup_parse_func(request) -> Generator:
     project_dir = os.path.dirname(__file__)
     files_dir = os.path.join(project_dir, "test_files/")
 
-    path_file_before = os.path.join(files_dir, "before.json")
-    path_file_after = os.path.join(files_dir, "after.json")
+    if request.param == 'bad extension':
+        path_file_before = os.path.join(files_dir, "not_support_file_before.html")
+        path_file_after = os.path.join(files_dir, "not_support_file_after.html")
+    else:
+        path_file_before = os.path.join(files_dir, "before.json")
+        path_file_after = os.path.join(files_dir, "after.json")
     path_file_after_yaml = os.path.join(files_dir, "after.yaml")
 
-    if request.param == 'normal':
+    if request.param == 'normal' or request.param == 'bad extension':
         with open(path_file_before, 'r') as file_1, \
                 open(path_file_after, 'r') as file_2:
             yield file_1, file_2, str(request.param)

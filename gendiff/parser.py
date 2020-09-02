@@ -11,7 +11,7 @@ from gendiff.products.abstract_product import AbstractProduct
 
 
 def get_concrete_product(factory: Optional[AbstractFactory],
-                         file_type: str) -> Optional[AbstractProduct]:
+                         file_type: str) -> AbstractProduct:
     """
     За счёт полученного расширения файла определяет какой конкретный продукт
     необходимо получить
@@ -19,31 +19,28 @@ def get_concrete_product(factory: Optional[AbstractFactory],
     :param file_type: расширение файла
     :return: product (*JSON, *YAML, *CONFIG)
     """
-    product = None
     if factory:
         if file_type == 'json':
-            product = factory.create_json()
+            return factory.create_json()
         elif file_type == 'yaml':
-            product = factory.create_yaml()
+            return factory.create_yaml()
         elif file_type == 'ini':
-            product = factory.create_config()
-        else:
-            raise SystemError
-    return product
+            return factory.create_config()
+    raise SystemError
 
 
-def get_concrete_factory(format_: str) -> Optional[AbstractFactory]:
+def get_concrete_factory(format_: str) -> AbstractFactory:
     """
     По полученному формата возращает фабрику из семейсива Nested или Plain
     :param format_: nested - default or plain
     :return: factory (Nested or Plain)
     """
-    factory = None
     if format_ == 'nested':
-        factory = FactoryNested()
+        return FactoryNested()
     elif format_ == 'plain':
-        factory = FactoryPlain()
-    return factory
+        return FactoryPlain()
+    else:
+        raise SystemError
 
 
 def parse(first_config: TextIOWrapper,
@@ -64,24 +61,32 @@ def parse(first_config: TextIOWrapper,
     status = 'Good'
 
     if f_format_file == s_format_file:
-        factory = get_concrete_factory(format_)
-        product = get_concrete_product(factory, f_format_file)
-
-        if product:
-            try:
-                deserialized_1 = product.read(first_config)
-                deserialized_2 = product.read(second_config)
-            except SystemError:
-                status = 'Parse error'
-                return status
-
-            diff = product.compare(deserialized_1, deserialized_2)
-            try:
-                product.render(diff)
-            except TypeError:
-                status = 'Render was stopped with error'
-        else:
-            status = 'Internal error'
+        # Try get valid factory
+        try:
+            factory = get_concrete_factory(format_)
+        except SystemError:
+            status = 'Invalid format report'
+            return status
+        # Try get valid product
+        try:
+            product = get_concrete_product(factory, f_format_file)
+        except SystemError:
+            status = 'Not support file extension'
+            return status
+        # Try deserialized from file
+        try:
+            deserialized_1 = product.read(first_config)
+            deserialized_2 = product.read(second_config)
+        except SystemError:
+            status = 'Parse error'
+            return status
+        # Compare two files
+        diff = product.compare(deserialized_1, deserialized_2)
+        # Try render report
+        try:
+            product.render(diff)
+        except TypeError:
+            status = 'Render was stopped with error'
     else:
         status = 'Not equal format file'
     return status
