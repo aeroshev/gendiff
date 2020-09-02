@@ -4,9 +4,9 @@
 from io import TextIOWrapper
 from typing import Any, Sequence, Union
 
-import click
 import pkg_resources
 
+import click
 from gendiff.parser import parse
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])

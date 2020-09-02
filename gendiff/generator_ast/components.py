@@ -2,7 +2,7 @@
 Содержит в себе класс Component необходимый для построения AST дерева
 """
 from enum import Enum, unique
-from typing import Set, Union, Any
+from typing import Any, Set, Union
 
 
 @unique

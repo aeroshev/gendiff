@@ -1,8 +1,8 @@
 """
 Этот модуль содержит в себе общий класс для всех продуктов
 """
-from io import TextIOWrapper
 from abc import ABC, abstractmethod
+from io import TextIOWrapper
 from typing import Any, Dict, Iterator, Set
 
 from gendiff.generator_ast.components import Component, ComponentState

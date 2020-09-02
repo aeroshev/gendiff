@@ -6,12 +6,11 @@
 в абстрактном классе
 """
 import json
-from io import TextIOWrapper
 from abc import abstractmethod
+from io import TextIOWrapper
 from typing import Any, Dict, List, Set
 
 from colorama import Fore, init
-
 from gendiff.generator_ast.components import Component, ComponentState
 from gendiff.products.abstract_product import AbstractProduct
 

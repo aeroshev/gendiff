@@ -6,14 +6,13 @@
 в абстрактном классе
 """
 import configparser
-from io import TextIOWrapper
 from abc import abstractmethod
-from typing import Any, Dict, Set, List
+from io import TextIOWrapper
+from typing import Any, Dict, List, Set
 
 from colorama import Fore, init
-
-from gendiff.products.abstract_product import AbstractProduct
 from gendiff.generator_ast.components import Component, ComponentState
+from gendiff.products.abstract_product import AbstractProduct
 
 
 class AbstractCONFIG(AbstractProduct):

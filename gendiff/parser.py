@@ -27,6 +27,8 @@ def get_concrete_product(factory: Optional[AbstractFactory],
             product = factory.create_yaml()
         elif file_type == 'ini':
             product = factory.create_config()
+        else:
+            raise SystemError
     return product
 
 

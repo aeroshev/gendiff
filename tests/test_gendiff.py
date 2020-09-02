@@ -1,13 +1,13 @@
 """
 Этот модуль содержит в себе юнит тесты для консольного скрипта gendiff
 """
-import pytest
 from typing import Set
+
+import pytest
 
 from gendiff.factories.factory import FactoryNested, FactoryPlain
 from gendiff.generator_ast.components import Component, ComponentState
-from gendiff.parser import (get_concrete_factory,
-                            get_concrete_product, parse)
+from gendiff.parser import get_concrete_factory, get_concrete_product, parse
 from gendiff.products.product_config import NestedCONFIG, PlainCONFIG
 from gendiff.products.product_json import NestedJSON, PlainJSON
 from gendiff.products.product_yaml import NestedYAML, PlainYAML
@@ -105,7 +105,7 @@ class TestGendiff:
                    {'abc': '12345'})
          }
 
-    def test_compare_func(self, setup_compare_test):
+    def test_compare_func(self, setup_compare_test) -> None:
         des_data_before, des_data_after, product = setup_compare_test
         diff = product.compare(des_data_before, des_data_after)
         if isinstance(product, NestedCONFIG):
@@ -113,7 +113,7 @@ class TestGendiff:
         else:
             assert diff == self.reference_ast
 
-    def test_decompot(self, setup_decompot):
+    def test_decompot(self, setup_decompot) -> None:
         product, type_test = setup_decompot
         if type_test == 'json':
             assert '{\n Hello, world: Hello, Python\n}' \
@@ -122,14 +122,15 @@ class TestGendiff:
             assert '\n    Hello, world: Hello, Python' \
                    == product.decomposition({'Hello, world': 'Hello, Python'})
         elif type_test == 'ini':
-            # TODO
-            return
+            assert 'Hello, world=Hello, Python' \
+                   == product.decomposition({'Hello, world': 'Hello, Python'})
+
         assert str(52) == product.decomposition(52)
         assert str('Hello') == product.decomposition('Hello')
         assert str(45, ) == product.decomposition(45, )
         assert str({'set'}) == product.decomposition({'set'})
 
-    def test_is_complex(self, setup_is_complex):
+    def test_is_complex(self, setup_is_complex) -> None:
         product = setup_is_complex
         assert '[complex value]' == product.is_complex({'Hello': 'Hello'})
         assert str(52) == product.is_complex(52)
@@ -138,7 +139,7 @@ class TestGendiff:
         assert str({'set'}) == product.is_complex({'set'})
 
     @pytest.mark.parametrize("format_", ['json', 'yaml', 'ini'])
-    def test_func_get_concrete_product(self, format_, setup_get_product):
+    def test_func_get_concrete_product(self, format_, setup_get_product) -> None:
         factory, type_test = setup_get_product
         product = get_concrete_product(factory, format_)
         if type_test == 'nested':
@@ -159,7 +160,7 @@ class TestGendiff:
             assert product is None
 
     @pytest.mark.parametrize("type_test", ['nested', 'plain', 'not_if_this'])
-    def test_func_get_concrete_factory(self, type_test):
+    def test_func_get_concrete_factory(self, type_test) -> None:
         factory = get_concrete_factory(type_test)
         if type_test == 'nested':
             assert isinstance(factory, FactoryNested)
@@ -170,7 +171,7 @@ class TestGendiff:
 
     @pytest.mark.parametrize("type_test", ['nested', 'plain'])
     @pytest.mark.parametrize("format_", ['json', 'yaml', 'ini'])
-    def test_raise_in_render(self, type_test, format_, setup_render_test):
+    def test_raise_in_render(self, type_test: str, format_: str, setup_render_test) -> None:
         invalid_ast = setup_render_test
         if type_test == 'nested':
             if format_ == 'json':
@@ -191,7 +192,7 @@ class TestGendiff:
                 with pytest.raises(TypeError):
                     product.render(invalid_ast)
 
-    def test_components(self):
+    def test_components(self) -> None:
         component_1 = Component('param',
                                 ComponentState.INSERT,
                                 45)
@@ -207,7 +208,7 @@ class TestGendiff:
         assert component_1 != component_2
 
     @pytest.mark.parametrize("format_", ['nested', 'plain', 'bad'])
-    def test_parse(self, format_, setup_parse_func):
+    def test_parse(self, format_: str, setup_parse_func) -> None:
         io_1, io_2, param = setup_parse_func
         if param == 'normal':
             if format_ != 'bad':

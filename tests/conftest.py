@@ -1,17 +1,15 @@
-import json
 import os
 from typing import Generator, Optional, Set, Tuple, Union
 
 import pytest
-import yaml
 
 from gendiff.factories.factory import (AbstractFactory,
                                        FactoryNested, FactoryPlain)
 from gendiff.generator_ast.components import Component, ComponentState
 from gendiff.products.abstract_product import AbstractProduct
+from gendiff.products.product_config import NestedCONFIG, PlainCONFIG
 from gendiff.products.product_json import NestedJSON, PlainJSON
 from gendiff.products.product_yaml import NestedYAML, PlainYAML
-from gendiff.products.product_config import NestedCONFIG, PlainCONFIG
 
 
 def get_product(type_: str) -> AbstractProduct:
