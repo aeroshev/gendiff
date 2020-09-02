@@ -1,6 +1,7 @@
 """
 Этот модуль содержит в себе общий класс для всех продуктов
 """
+from io import TextIOWrapper
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Iterator, Set
 
@@ -17,11 +18,11 @@ class AbstractProduct(ABC):
         self.ast: Set[Component] = set()
 
     @abstractmethod
-    def read(self, data: str) -> Dict[str, Any]:
+    def read(self, file: TextIOWrapper) -> Dict[str, Any]:
         """
         Функция десериализации данных, которая
         оссобенна для каждого формата
-        :param data:
+        :param file:
         :return:
         """
 

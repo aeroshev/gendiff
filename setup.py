@@ -21,8 +21,7 @@ setup(
         "Linter": ["flake8==3.8.3"],
         "Test": ["pytest==6.0.1"],
         "Isort": ["isort==5.4.2"],
-        "Mypy": ["mypy==0.782"],
-        "Pylint": ["pylint==2.6.0"]
+        "Mypy": ["mypy==0.782"]
     },
     entry_points={
         "console_scripts": [

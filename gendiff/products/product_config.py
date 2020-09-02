@@ -6,6 +6,7 @@
 в абстрактном классе
 """
 import configparser
+from io import TextIOWrapper
 from abc import abstractmethod
 from typing import Any, Dict, Set
 
@@ -20,19 +21,21 @@ class AbstractCONFIG(AbstractProduct):
     асбтрактные методы, которые необходимо переопределить
     для различных продуктов
     """
-    def __init__(self):
-        super().__init__()
-        self.parser = configparser.ConfigParser()
-
-    def read(self, data: str) -> Dict[str, Any]:
+    def read(self, file: TextIOWrapper) -> Dict[str, Any]:
         """
         Десериализация строковых данных в python формат
-        :param data: данные из файла
+        :param file: данные из файла
         :return: словарик словариков
         """
+        returning_dict: Dict[str, Any] = {}
         parser = configparser.ConfigParser()
-        parser.read(data)
-        return {'Hello': 'world'}
+
+        parser.read(file.name)
+        for section in parser.sections():
+            returning_dict.update({section: {}})
+            for key in parser[section]:
+                returning_dict[section].update({key: parser[section][key]})
+        return returning_dict
 
     @abstractmethod
     def render(self, result: Set[Component]) -> None:

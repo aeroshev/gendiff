@@ -11,46 +11,31 @@ from gendiff.generator_ast.components import Component, ComponentState
 from gendiff.products.abstract_product import AbstractProduct
 from gendiff.products.product_json import NestedJSON, PlainJSON
 from gendiff.products.product_yaml import NestedYAML, PlainYAML
+from gendiff.products.product_config import NestedCONFIG, PlainCONFIG
 
 
-def deserialization(data: str, type_: str):
-    """
-    Десериализация файловых данных в python тип
-    :param data:
-    :param type_:
-    :return:
-    """
-    res = None
-    if type_ == 'json':
-        res = json.loads(data)
-    elif type_ == 'yaml':
-        res = yaml.load(data, yaml.Loader)
-    elif type_ == 'ini':
-        pass
-    return res
-
-
-def get_product(type_: str) -> Optional[AbstractProduct]:
+def get_product(type_: str) -> AbstractProduct:
     """
     Возращает продукт для теста
     :param type_:
     :return:
     """
-    product = None
     if type_ == 'json':
-        product = NestedJSON()
+        return NestedJSON()
     elif type_ == 'yaml':
-        product = NestedYAML()
+        return NestedYAML()
     elif type_ == 'ini':
-        pass
-    return product
+        return NestedCONFIG()
+    else:
+        raise TypeError
 
 
 @pytest.fixture(scope="function", params=[
     'json',
-    'yaml'
+    'yaml',
+    'ini'
 ])
-def setup_compare_test(request) -> Tuple[dict, dict, AbstractProduct]:
+def setup_compare_test(request) -> Generator:
     project_dir = os.path.dirname(__file__)
     files_dir = os.path.join(project_dir, "test_files/")
 
@@ -61,12 +46,9 @@ def setup_compare_test(request) -> Tuple[dict, dict, AbstractProduct]:
 
     with open(path_file_before, 'r') as file_1, \
             open(path_file_after, 'r') as file_2:
-        data_1 = file_1.read()
-        data_2 = file_2.read()
-
-        des_data_1 = deserialization(data_1, request.param)
-        des_data_2 = deserialization(data_2, request.param)
-        return des_data_1, des_data_2, product
+        des_data_1 = product.read(file_1)
+        des_data_2 = product.read(file_2)
+        yield des_data_1, des_data_2, product
 
 
 @pytest.fixture(scope="function", params=[
@@ -85,24 +67,35 @@ def setup_get_product(request) -> Tuple[Optional[AbstractFactory], str]:
 
 @pytest.fixture(scope="function", params=[
     'json',
-    'yaml'
+    'yaml',
+    'ini'
 ])
-def setup_decompot(request) -> Tuple[Union[NestedJSON, NestedYAML], str]:
+def setup_decompot(request) -> Tuple[Union[
+                                         NestedJSON,
+                                         NestedYAML,
+                                         NestedCONFIG], str]:
     if request.param == 'json':
         return NestedJSON(), request.param
-    else:
+    elif request.param == 'yaml':
         return NestedYAML(), request.param
+    else:
+        return NestedCONFIG(), request.param
 
 
 @pytest.fixture(scope="function", params=[
     'json',
-    'yaml'
+    'yaml',
+    'ini'
 ])
-def setup_is_complex(request) -> Union[PlainJSON, PlainYAML]:
+def setup_is_complex(request) -> Union[PlainJSON,
+                                       PlainYAML,
+                                       PlainCONFIG]:
     if request.param == 'json':
         return PlainJSON()
-    else:
+    elif request.param == 'yaml':
         return PlainYAML()
+    else:
+        return PlainCONFIG()
 
 
 @pytest.fixture(scope="function", params=[
@@ -144,20 +137,6 @@ def setup_render_test(request) -> Set[Component]:
         return invalid_set_ast
     else:
         return invalid_state_ast
-
-
-@pytest.fixture(scope="function", params=[
-    'string',
-    'number',
-    'structure'
-])
-def setup_read_file_test(request):
-    if request.param == 'string':
-        return 'not_a_file'
-    elif request.param == 'number':
-        return 42
-    else:
-        return {'Hello': 'World!'}
 
 
 @pytest.fixture(scope="function", params=[

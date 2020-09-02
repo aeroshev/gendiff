@@ -10,7 +10,7 @@ from gendiff.factories.factory import (AbstractFactory,
 from gendiff.products.abstract_product import AbstractProduct
 
 
-def get_concrete_product(factory: AbstractFactory,
+def get_concrete_product(factory: Optional[AbstractFactory],
                          file_type: str) -> Optional[AbstractProduct]:
     """
     За счёт полученного расширения файла определяет какой конкретный продукт
@@ -44,19 +44,6 @@ def get_concrete_factory(format_: str) -> Optional[AbstractFactory]:
     return factory
 
 
-def read_file(file_name: TextIOWrapper) -> str:
-    """
-    Чтение файла.
-    Контекстный оператор не используется, т.к. click сам открывает файл
-    :param file_name:
-    :return: data from file
-    """
-    if isinstance(file_name, TextIOWrapper):
-        return file_name.read()
-    else:
-        raise TypeError
-
-
 def parse(first_config: TextIOWrapper,
           second_config: TextIOWrapper,
           format_: str) -> str:
@@ -78,16 +65,13 @@ def parse(first_config: TextIOWrapper,
         factory = get_concrete_factory(format_)
         product = get_concrete_product(factory, f_format_file)
 
-        try:
-            first_data = read_file(first_config)
-            second_data = read_file(second_config)
-        except TypeError:
-            status = 'Error parse'
-            return status
-
         if product:
-            deserialized_1 = product.read(first_data)
-            deserialized_2 = product.read(second_data)
+            try:
+                deserialized_1 = product.read(first_config)
+                deserialized_2 = product.read(second_config)
+            except SystemError:
+                status = 'Parse error'
+                return status
 
             diff = product.compare(deserialized_1, deserialized_2)
             try:

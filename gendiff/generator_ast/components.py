@@ -2,7 +2,7 @@
 Содержит в себе класс Component необходимый для построения AST дерева
 """
 from enum import Enum, unique
-from typing import Set, Union
+from typing import Set, Union, Any
 
 
 @unique
@@ -28,26 +28,23 @@ class Component:
 
     __slots__ = ('param', 'state', 'value')
 
-    def __init__(self, param, state, value):
+    def __init__(self, param: str, state: ComponentState, value: Any) -> None:
         self.param: str = param
         self.state: ComponentState = state
-        self.value: Union[Set[Component],
-                          bool,
-                          int,
-                          float,
-                          tuple,
-                          str] = value
+        self.value: Union[Set[Component], Any] = value
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f'{self.param}, {self.state}, {self.value}'
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'{self.param}, {self.state}, {self.value}'
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Component):
+            return NotImplemented
         return True if self.param == other.param \
                        and self.state == other.state \
                        and self.value == other.value else False
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.param) + hash(self.state)

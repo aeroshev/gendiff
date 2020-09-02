@@ -6,6 +6,7 @@
 в абстрактном классе
 """
 from abc import abstractmethod
+from io import TextIOWrapper
 from typing import Any, Dict, List, Set
 
 import yaml
@@ -22,13 +23,17 @@ class AbstractYAML(AbstractProduct):
     асбтрактные методы, которые необходимо переопределить
     для различных продуктов
     """
-    def read(self, data: str) -> Dict[str, Any]:
+    def read(self, file: TextIOWrapper) -> Dict[str, Any]:
         """
         Десериализация строковых данных в python формат
-        :param data: данные из файла
+        :param file: данные из файла
         :return: словарик словариков
         """
-        return yaml.load(data, yaml.Loader)
+        data = yaml.load(file, yaml.Loader)
+        if isinstance(data, dict):
+            return data
+        else:
+            raise SystemError
 
     @abstractmethod
     def render(self, result: Set[Component]) -> None:

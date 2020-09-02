@@ -2,53 +2,116 @@
 Этот модуль содержит в себе юнит тесты для консольного скрипта gendiff
 """
 import pytest
+from typing import Set
 
 from gendiff.factories.factory import FactoryNested, FactoryPlain
 from gendiff.generator_ast.components import Component, ComponentState
 from gendiff.parser import (get_concrete_factory,
-                            get_concrete_product, read_file, parse)
+                            get_concrete_product, parse)
 from gendiff.products.product_config import NestedCONFIG, PlainCONFIG
 from gendiff.products.product_json import NestedJSON, PlainJSON
 from gendiff.products.product_yaml import NestedYAML, PlainYAML
 
 
 class TestGendiff:
-    reference_ast = {Component('group3',
-                               ComponentState.INSERT,
-                               {'fee': '100500'}),
-                     Component('group2',
-                               ComponentState.DELETE,
-                               {'abc': '12345'}),
-                     Component('group1', ComponentState.CHILDREN, {
-                         Component('baz',
-                                   ComponentState.UPDATE,
-                                   ('bas', 'bars')),
-                         Component('nest', ComponentState.UPDATE, (
-                             {'key': 'value'},
-                             'str'
-                         ))
-                     }),
-                     Component('common', ComponentState.CHILDREN, {
-                         Component('setting2', ComponentState.DELETE, '200'),
-                         Component('setting3', ComponentState.UPDATE, (
-                             True,
-                             {'key': 'value'}
-                         )),
-                         Component('setting4',
-                                   ComponentState.INSERT,
-                                   'blah blah'),
-                         Component('setting5', ComponentState.INSERT, {
-                             'key5': 'value5'
-                         }),
-                         Component('setting6', ComponentState.CHILDREN, {
-                             Component('ops', ComponentState.INSERT, 'vops')
-                         })
-                     })}
+    reference_ast: Set[Component] = \
+        {Component('group3',
+                   ComponentState.INSERT,
+                   {'fee': '100500'}),
+         Component('group2',
+                   ComponentState.DELETE,
+                   {'abc': '12345'}),
+         Component('group1',
+                   ComponentState.CHILDREN, {
+                       Component('baz',
+                                 ComponentState.UPDATE,
+                                 ('bas', 'bars')),
+                       Component('nest',
+                                 ComponentState.UPDATE, (
+                                     {'key': 'value'},
+                                     'str'
+                                 ))
+                   }),
+         Component('common', ComponentState.CHILDREN, {
+             Component('setting2',
+                       ComponentState.DELETE,
+                       '200'),
+             Component('setting3',
+                       ComponentState.UPDATE, (
+                           True,
+                           {'key': 'value'}
+                       )),
+             Component('setting4',
+                       ComponentState.INSERT,
+                       'blah blah'),
+             Component('setting5',
+                       ComponentState.INSERT, {
+                           'key5': 'value5'
+                       }),
+             Component('setting6',
+                       ComponentState.CHILDREN, {
+                           Component('ops',
+                                     ComponentState.INSERT,
+                                     'vops')
+                       })
+         })}
+
+    reference_ast_ini: Set[Component] = \
+        {Component('common',
+                   ComponentState.CHILDREN,
+                   {Component('setting2',
+                              ComponentState.DELETE,
+                              '200'),
+                    Component('setting3',
+                              ComponentState.DELETE,
+                              'true'
+                              )}
+                   ),
+         Component('common.setting3',
+                   ComponentState.INSERT,
+                   {'key': 'value'}
+                   ),
+         Component('common.setting4',
+                   ComponentState.INSERT,
+                   {'setting4': 'blah blah'}
+                   ),
+         Component('common.setting5',
+                   ComponentState.INSERT,
+                   {'key5': 'value5'}
+                   ),
+         Component('common.setting6',
+                   ComponentState.CHILDREN,
+                   {
+                       Component('ops',
+                                 ComponentState.INSERT,
+                                 'vops')
+                   }
+                   ),
+         Component('group1',
+                   ComponentState.CHILDREN,
+                   {Component('nest',
+                              ComponentState.INSERT,
+                              'str'),
+                    Component('baz',
+                              ComponentState.UPDATE,
+                              ('bas', 'bars')
+                              )
+                    }),
+         Component('group1.nest',
+                   ComponentState.DELETE,
+                   {'key': 'value'}),
+         Component('group2',
+                   ComponentState.DELETE,
+                   {'abc': '12345'})
+         }
 
     def test_compare_func(self, setup_compare_test):
         des_data_before, des_data_after, product = setup_compare_test
         diff = product.compare(des_data_before, des_data_after)
-        assert diff == self.reference_ast
+        if isinstance(product, NestedCONFIG):
+            assert diff == self.reference_ast_ini
+        else:
+            assert diff == self.reference_ast
 
     def test_decompot(self, setup_decompot):
         product, type_test = setup_decompot
@@ -58,6 +121,9 @@ class TestGendiff:
         elif type_test == 'yaml':
             assert '\n    Hello, world: Hello, Python' \
                    == product.decomposition({'Hello, world': 'Hello, Python'})
+        elif type_test == 'ini':
+            # TODO
+            return
         assert str(52) == product.decomposition(52)
         assert str('Hello') == product.decomposition('Hello')
         assert str(45, ) == product.decomposition(45, )
@@ -71,7 +137,7 @@ class TestGendiff:
         assert str(45, ) == product.is_complex(45, )
         assert str({'set'}) == product.is_complex({'set'})
 
-    @pytest.mark.parametrize("format_", ['json', 'yaml', 'config'])
+    @pytest.mark.parametrize("format_", ['json', 'yaml', 'ini'])
     def test_func_get_concrete_product(self, format_, setup_get_product):
         factory, type_test = setup_get_product
         product = get_concrete_product(factory, format_)
@@ -103,7 +169,7 @@ class TestGendiff:
             assert factory is None
 
     @pytest.mark.parametrize("type_test", ['nested', 'plain'])
-    @pytest.mark.parametrize("format_", ['json', 'yaml'])
+    @pytest.mark.parametrize("format_", ['json', 'yaml', 'ini'])
     def test_raise_in_render(self, type_test, format_, setup_render_test):
         invalid_ast = setup_render_test
         if type_test == 'nested':
@@ -125,17 +191,17 @@ class TestGendiff:
                 with pytest.raises(TypeError):
                     product.render(invalid_ast)
 
-    def test_read_file(self, setup_read_file_test):
-        invalid_file = setup_read_file_test
-        with pytest.raises(TypeError):
-            read_file(invalid_file)
-
     def test_components(self):
-        component_1 = Component('param', ComponentState.INSERT, 45)
-        component_2 = Component('second param', ComponentState.DELETE, 'deleted')
+        component_1 = Component('param',
+                                ComponentState.INSERT,
+                                45)
+        component_2 = Component('second param',
+                                ComponentState.DELETE,
+                                'deleted')
 
         assert str(component_1) == 'param, ComponentState.INSERT, 45'
-        assert str(component_2) == 'second param, ComponentState.DELETE, deleted'
+        assert str(component_2) == 'second param, ' \
+                                   'ComponentState.DELETE, deleted'
 
         assert component_1 == component_1
         assert component_1 != component_2
