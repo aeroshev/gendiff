@@ -14,7 +14,7 @@ class AbstractProduct(ABC):
     Через него определяются общие интерфейсы для всех
     наследников
     """
-    def __init__(self):
+    def __init__(self) -> None:
         self.ast: Set[Component] = set()
 
     @abstractmethod

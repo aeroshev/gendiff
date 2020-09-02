@@ -50,7 +50,7 @@ class PlainJSON(AbstractJSON):
     """
     __slots__ = ('ast', 'path')
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.path: List[str] = []
         init()
@@ -101,7 +101,7 @@ class NestedJSON(AbstractJSON):
     """
     __slots__ = ('deep', 'ast')
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.deep: int = 0
         init()

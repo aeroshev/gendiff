@@ -31,7 +31,7 @@ class Component:
     def __init__(self, param: str, state: ComponentState, value: Any) -> None:
         self.param: str = param
         self.state: ComponentState = state
-        self.value: Union[Set[Component], Any] = value
+        self.value: Any = value
 
     def __str__(self) -> str:
         return f'{self.param}, {self.state}, {self.value}'
