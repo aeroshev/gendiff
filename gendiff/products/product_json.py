@@ -79,7 +79,7 @@ class PlainJSON(AbstractJSON):
                           f'{Fore.YELLOW}\'{".".join(self.path)}\''
                           f'{Fore.WHITE} was updated. From '
                           f'{Fore.RED}'
-                          f'{self.is_complex(item.value)} '
+                          f'{self.is_complex(item.value[0])} '
                           f'{Fore.WHITE}to '
                           f'{Fore.GREEN}'
                           f'{self.is_complex(item.value[1])}')

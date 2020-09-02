@@ -25,7 +25,7 @@ def get_concrete_product(factory: Optional[AbstractFactory],
             product = factory.create_json()
         elif file_type == 'yaml':
             product = factory.create_yaml()
-        elif file_type == 'config':
+        elif file_type == 'ini':
             product = factory.create_config()
     return product
 
