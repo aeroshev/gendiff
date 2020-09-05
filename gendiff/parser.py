@@ -58,35 +58,30 @@ def parse(first_config: TextIOWrapper,
     f_format_file = first_config.name.split('.')[-1]
     s_format_file = second_config.name.split('.')[-1]
 
-    status = 'Good'
-
     if f_format_file == s_format_file:
         # Try get valid factory
         try:
             factory = get_concrete_factory(format_)
         except SystemError:
-            status = 'Invalid format report'
-            return status
+            return 'Invalid format report'
         # Try get valid product
         try:
             product = get_concrete_product(factory, f_format_file)
         except SystemError:
-            status = 'Not support file extension'
-            return status
+            return 'Not support file extension'
         # Try deserialized from file
         try:
             deserialized_1 = product.read(first_config)
             deserialized_2 = product.read(second_config)
         except SystemError:
-            status = 'Parse error'
-            return status
+            return 'Parse error'
         # Compare two files
         diff = product.compare(deserialized_1, deserialized_2)
         # Try render report
         try:
-            product.render(diff)
+            status = product.render(diff)
         except TypeError:
-            status = 'Render was stopped with error'
+            return  'Render was stopped with error'
     else:
-        status = 'Not equal format file'
+        return 'Not equal format file'
     return status

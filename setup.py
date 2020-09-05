@@ -14,8 +14,7 @@ setup(
     include_package_data=True,
     install_requires=[
         "Click==7.1.2",
-        "PyYAML==5.3.1",
-        "Colorama==0.4.3"
+        "PyYAML==5.3.1"
     ],
     extras_require={
         "Linter": ["flake8==3.8.3"],

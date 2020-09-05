@@ -217,7 +217,7 @@ class TestGendiff:
         io_1, io_2, param = setup_parse_func
         if param == 'normal':
             if format_ != 'bad':
-                assert parse(io_1, io_2, format_) == 'Good'
+                assert parse(io_1, io_2, format_) != ''
             else:
                 assert parse(io_1, io_2, format_) == 'Invalid format report'
         elif param == 'bad extension':

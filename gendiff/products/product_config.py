@@ -10,7 +10,6 @@ from abc import abstractmethod
 from io import TextIOWrapper
 from typing import Any, Dict, List, Set
 
-from colorama import Fore, init
 from gendiff.generator_ast.components import Component, ComponentState
 from gendiff.products.abstract_product import AbstractProduct
 
@@ -40,7 +39,7 @@ class AbstractCONFIG(AbstractProduct):
         return returning_dict
 
     @abstractmethod
-    def render(self, result: Set[Component]) -> None:
+    def dirty_render(self, result: Set[Component]) -> str:
         """
         Вывод различий в терминал пользавателю
         В каждом классе определяется свой стиль
@@ -53,63 +52,63 @@ class PlainCONFIG(AbstractCONFIG):
     """
     Класс переопределяющий метод render для плоского вывода результат
     """
-    __slots__ = ('ast', 'path')
+    __slots__ = ('ast', 'path', 'paint', 'report')
 
     def __init__(self) -> None:
         super().__init__()
         self.path: List[str] = []
-        init()
 
     @staticmethod
     def is_complex(value: Any) -> str:
         return '[complex value]' if isinstance(value, dict) else str(value)
 
-    def render(self, result: Set[Component]) -> None:
+    def dirty_render(self, result: Set[Component]) -> str:
         for item in result:
             self.path.append(item.param)
             if item.state == ComponentState.INSERT:
-                print(f'{Fore.WHITE}Property '
-                      f'{Fore.GREEN}\'{".".join(self.path)}\''
-                      f'{Fore.WHITE} was added with value: '
-                      f'{Fore.GREEN}'
-                      f'{self.is_complex(item.value)}')
+                self.report += f'{self.paint.SIMPLE}Property '\
+                               f'{self.paint.INSERT}\'{".".join(self.path)}\''\
+                               f'{self.paint.SIMPLE} was added with value: '\
+                               f'{self.paint.INSERT}'\
+                               f'{self.is_complex(item.value)}\n'
             elif item.state == ComponentState.DELETE:
-                print(f'{Fore.WHITE}Property '
-                      f'{Fore.RED}\'{".".join(self.path)}\''
-                      f'{Fore.WHITE} was removed')
+                self.report += f'{self.paint.SIMPLE}Property '\
+                               f'{self.paint.DELETE}\'{".".join(self.path)}\''\
+                               f'{self.paint.SIMPLE} was removed\n'
             elif item.state == ComponentState.UPDATE:
                 if isinstance(item.value, tuple):
-                    print(f'{Fore.WHITE}Property '
-                          f'{Fore.YELLOW}\'{".".join(self.path)}\''
-                          f'{Fore.WHITE} was updated. From '
-                          f'{Fore.RED}'
-                          f'{self.is_complex(item.value[0])} '
-                          f'{Fore.WHITE}to '
-                          f'{Fore.GREEN}'
-                          f'{self.is_complex(item.value[1])}')
+                    self.report += f'{self.paint.SIMPLE}Property '\
+                                   f'{self.paint.UPDATE}' \
+                                   f'\'{".".join(self.path)}\'' \
+                                   f'{self.paint.SIMPLE} was updated. From ' \
+                                   f'{self.paint.DELETE}' \
+                                   f'{self.is_complex(item.value[0])} ' \
+                                   f'{self.paint.SIMPLE}to ' \
+                                   f'{self.paint.INSERT}'\
+                                   f'{self.is_complex(item.value[1])}\n'
                 else:
                     raise TypeError
             elif item.state == ComponentState.CHILDREN:
                 if isinstance(item.value, set):
-                    self.render(item.value)
+                    self.dirty_render(item.value)
                 else:
                     raise TypeError
             else:
                 raise TypeError
             self.path.pop(-1)
-        print(f'{Fore.WHITE}', end='')
+
+        return self.report
 
 
 class NestedCONFIG(AbstractCONFIG):
     """
     Класс переопределяющий метод render для вложенного вывода результат
     """
-    __slots__ = ('deep', 'ast')
+    __slots__ = ('deep', 'ast', 'paint', 'report')
 
     def __init__(self) -> None:
         super().__init__()
         self.deep: int = 0
-        init()
 
     @staticmethod
     def decomposition(object_: Any) -> str:
@@ -126,37 +125,39 @@ class NestedCONFIG(AbstractCONFIG):
             value = str(object_)
         return value
 
-    def render(self, result: Set[Component]) -> None:
+    def dirty_render(self, result: Set[Component]) -> str:
         for item in result:
             if item.state == ComponentState.INSERT:
-                print(self.deep * ' ' +
-                      f'{Fore.GREEN}+ [{item.param}]\n'
-                      + (self.deep + 2) * ' ' +
-                      f'{self.decomposition(item.value)}')
+                self.report += self.deep * ' ' + \
+                               f'{self.paint.INSERT}+ [{item.param}]\n' + \
+                               (self.deep + 2) * ' ' + \
+                               f'{self.decomposition(item.value)}\n'
             elif item.state == ComponentState.DELETE:
-                print(self.deep * ' ' +
-                      f'{Fore.RED}- [{item.param}]\n'
-                      + (self.deep + 2) * ' ' +
-                      f'{self.decomposition(item.value)}')
+                self.report += self.deep * ' ' + \
+                               f'{self.paint.DELETE}- [{item.param}]\n' + \
+                               (self.deep + 2) * ' ' + \
+                               f'{self.decomposition(item.value)}\n'
             elif item.state == ComponentState.UPDATE:
                 if isinstance(item.value, tuple):
-                    print(self.deep * ' ' +
-                          f'{Fore.RED}- [{item.param}]\n'
-                          + (self.deep + 2) * ' ' +
-                          f'{self.decomposition(item.value[0])}')
-                    print(self.deep * ' ' +
-                          f'{Fore.GREEN}+ [{item.param}]\n'
-                          + (self.deep + 2) * ' ' +
-                          f'{self.decomposition(item.value[1])}')
+                    self.report += self.deep * ' ' + \
+                                   f'{self.paint.DELETE}- [{item.param}]\n' + \
+                                   (self.deep + 2) * ' ' + \
+                                   f'{self.decomposition(item.value[0])}\n' + \
+                                   self.deep * ' ' + f'{self.paint.INSERT}+ ' \
+                                                     f'[{item.param}]\n' + \
+                                   (self.deep + 2) * ' ' + \
+                                   f'{self.decomposition(item.value[1])}\n'
                 else:
                     raise TypeError
             elif item.state == ComponentState.CHILDREN:
                 if isinstance(item.value, set):
-                    print(Fore.WHITE + self.deep * ' ' +
-                          f'[{item.param}]')
-                    self.render(item.value)
+                    self.report += self.paint.SIMPLE + \
+                                   self.deep * ' ' + \
+                                   f'[{item.param}]\n'
+                    self.dirty_render(item.value)
                 else:
                     raise TypeError
             else:
                 raise TypeError
-            print(f'{Fore.WHITE}', end='')
+
+        return self.report

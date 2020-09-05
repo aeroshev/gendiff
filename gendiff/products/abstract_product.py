@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from io import TextIOWrapper
 from typing import Any, Dict, Iterator, Set
 
+from gendiff.colors import Colors
 from gendiff.generator_ast.components import Component, ComponentState
 
 
@@ -16,6 +17,8 @@ class AbstractProduct(ABC):
     """
     def __init__(self) -> None:
         self.ast: Set[Component] = set()
+        self.paint: Colors = Colors()
+        self.report: str = ''
 
     @abstractmethod
     def read(self, file: TextIOWrapper) -> Dict[str, Any]:
@@ -98,8 +101,14 @@ class AbstractProduct(ABC):
 
         return self.ast
 
+    def render(self, result: Set[Component]) -> str:
+        output_string: str = self.dirty_render(result)
+        self.paint.flush()
+        self.report = ''
+        return output_string
+
     @abstractmethod
-    def render(self, result: Set[Component]) -> None:
+    def dirty_render(self, result: Set[Component]) -> str:
         """
         Представление пользователю
         оформленного отчёта о
