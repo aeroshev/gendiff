@@ -102,6 +102,11 @@ class AbstractProduct(ABC):
         return self.ast
 
     def render(self, result: Set[Component]) -> str:
+        """
+        Представление пользователю
+        оформленного отчёта о
+        найденных различиях
+        """
         output_string: str = self.dirty_render(result)
         self.paint.flush()
         self.report = ''
@@ -110,9 +115,10 @@ class AbstractProduct(ABC):
     @abstractmethod
     def dirty_render(self, result: Set[Component]) -> str:
         """
-        Представление пользователю
-        оформленного отчёта о
-        найденных различиях
+        Грязный рендер, который требует сброса
+        внутренней переменной report
+        не рекомендуется для отчёта
+        пользователю
         :param result:
         :return:
         """
